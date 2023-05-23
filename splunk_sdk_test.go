@@ -1,6 +1,7 @@
 package splunksdk
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -32,7 +33,8 @@ func TestSplunkAPI(t *testing.T) {
 		Token: apiToken,
 	}
 	// get the metric we want
-	metric, err := GetMetric(client, sc, search, nil)
+	metric, err := GetMetric(client, &sc, search, nil)
+	fmt.Printf("Endpoint : %s\n\n", sc.Endpoint)
 	if err != nil {
 		t.Errorf("Error : %s\n", err)
 		return

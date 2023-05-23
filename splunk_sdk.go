@@ -20,7 +20,7 @@ type SplunkCreds struct {
 	Endpoint string
 }
 
-func GetMetric(client *http.Client, splunkCreds SplunkCreds, searchQuery string, headers map[string]string) (float64, error) {
+func GetMetric(client *http.Client, splunkCreds *SplunkCreds, searchQuery string, headers map[string]string) (float64, error) {
 
 	const RESULTS_URI = "results"
 	endpoint, err := CreateJobEndpoint(splunkCreds)
@@ -63,7 +63,7 @@ func GetMetric(client *http.Client, splunkCreds SplunkCreds, searchQuery string,
 	return metric, nil
 }
 
-func CreateJobEndpoint(sc SplunkCreds) (string, error) {
+func CreateJobEndpoint(sc *SplunkCreds) (string, error) {
 	host := sc.Host
 	port := sc.Port
 
@@ -93,7 +93,7 @@ func getBearer(token string) string {
 	return token
 }
 
-func httpRequest(method string, client *http.Client, splunkCreds SplunkCreds, params url.Values, headers map[string]string) (*http.Response, error) {
+func httpRequest(method string, client *http.Client, splunkCreds *SplunkCreds, params url.Values, headers map[string]string) (*http.Response, error) {
 
 	// create a new request
 	req, err := http.NewRequest(method, splunkCreds.Endpoint, strings.NewReader(params.Encode()))
@@ -118,12 +118,12 @@ func httpRequest(method string, client *http.Client, splunkCreds SplunkCreds, pa
 	// defer resp.Body.Close()
 	return resp, nil
 }
-func post(client *http.Client, splunkCreds SplunkCreds, params url.Values, headers map[string]string) (*http.Response, error) {
+func post(client *http.Client, splunkCreds *SplunkCreds, params url.Values, headers map[string]string) (*http.Response, error) {
 
 	return httpRequest("POST", client, splunkCreds, params, headers)
 }
 
-func get(client *http.Client, splunkCreds SplunkCreds, params url.Values, headers map[string]string) (*http.Response, error) {
+func get(client *http.Client, splunkCreds *SplunkCreds, params url.Values, headers map[string]string) (*http.Response, error) {
 
 	return httpRequest("GET", client, splunkCreds, params, headers)
 }
@@ -137,7 +137,7 @@ func validateSearchQuery(searchQuery string) string {
 	return searchQuery
 }
 
-func postSearch(client *http.Client, splunkCreds SplunkCreds, searchQuery string, headers map[string]string) (string, error) {
+func postSearch(client *http.Client, splunkCreds *SplunkCreds, searchQuery string, headers map[string]string) (string, error) {
 	// make the post request
 	// params to send
 	params := url.Values{}
@@ -163,7 +163,7 @@ func postSearch(client *http.Client, splunkCreds SplunkCreds, searchQuery string
 	return sid, nil
 }
 
-func getSearch(client *http.Client, splunkCreds SplunkCreds, headers map[string]string) ([]map[string]string, error) {
+func getSearch(client *http.Client, splunkCreds *SplunkCreds, headers map[string]string) ([]map[string]string, error) {
 	// new parameters for the get request
 	getParams := url.Values{}
 	getParams.Add("output_mode", "json")
