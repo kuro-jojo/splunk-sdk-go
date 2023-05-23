@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	logger "github.com/sirupsen/logrus"
+
 )
 
 const CREATE_JOB_URI = "services/search/jobs/"
@@ -42,7 +44,7 @@ func GetMetric(client *http.Client, splunkCreds *SplunkCreds, searchQuery string
 
 	// the endpoint where to find the corresponding job
 	splunkCreds.Endpoint = newEndpoint + RESULTS_URI
-	fmt.Printf("Endpoint : %s\n\n", splunkCreds.Endpoint)
+	logger.Infof("Endpoint : %s\n\n", splunkCreds.Endpoint)
 
 	res, err := getSearch(client, splunkCreds, headers)
 	if err != nil {
