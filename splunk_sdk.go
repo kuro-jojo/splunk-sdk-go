@@ -42,6 +42,8 @@ func GetMetric(client *http.Client, splunkCreds *SplunkCreds, searchQuery string
 
 	// the endpoint where to find the corresponding job
 	splunkCreds.Endpoint = newEndpoint + RESULTS_URI
+	fmt.Printf("Endpoint : %s\n\n", splunkCreds.Endpoint)
+
 	res, err := getSearch(client, splunkCreds, headers)
 	if err != nil {
 		return -1, fmt.Errorf("error while handling the results. Error message : %s", err)
