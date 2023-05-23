@@ -12,7 +12,7 @@ import (
 
 func TestSplunkAPI(t *testing.T) {
 
-	err := godotenv.Load(".env")
+	err := godotenv.Load("go.env")
 	if os.Getenv("ENV") == "dev" {
 		err = godotenv.Load(".env.local")
 	}
