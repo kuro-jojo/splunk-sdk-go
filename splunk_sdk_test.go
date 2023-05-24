@@ -1,6 +1,8 @@
 package splunksdk
 
 import (
+	// "crypto/tls"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,6 +15,9 @@ import (
 
 func TestSplunkAPI(t *testing.T) {
 
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
 	err := godotenv.Load("go.env")
 	if os.Getenv("ENV") == "dev" {
 		err = godotenv.Load(".env.local")
@@ -22,9 +27,10 @@ func TestSplunkAPI(t *testing.T) {
 	}
 	apiToken := os.Getenv("SPLUNK_TOKEN")
 
-	search := "source=/opt/splunk/var/log/secure.log host=738b40135f4d sourcetype=osx_secure |stats count"
+	search := "source=/opt/splunk/var/log/secure.log sourcetype=osx_secure |stats count"
 	// create the http client
 	client := &http.Client{
+		Transport: tr,
 		Timeout: time.Duration(1) * time.Second,
 	}
 	sc := SplunkCreds{
@@ -36,7 +42,7 @@ func TestSplunkAPI(t *testing.T) {
 
 	// get the metric we want
 	metric, err := GetMetric(client, &sc, search, nil)
-	fmt.Printf("Endpoint : %s\n\n", sc.Endpoint)
+	fmt.Printf("Endpoint : %s\n\n", sc)
 	if err != nil {
 		t.Errorf("Error : %s\n", err)
 		return

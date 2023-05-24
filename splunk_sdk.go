@@ -52,7 +52,7 @@ func GetMetric(client *http.Client, splunkCreds *SplunkCreds, searchQuery string
 	}
 	// if the result is not a metric
 	if len(res) != 1 {
-		return -1, fmt.Errorf("incorrect search result. Error message : %s", err)
+		return -1, fmt.Errorf("incorrect search result. Error message : %v", err)
 	}
 	var metrics []string
 
@@ -76,7 +76,7 @@ func CreateJobEndpoint(sc *SplunkCreds) (string, error) {
 	if !regexp.MustCompile(match).MatchString(host) {
 		return "", fmt.Errorf("")
 	}
-	return "http://" + host + ":" + port + "/" + CREATE_JOB_URI, nil
+	return "https://" + host + ":" + port + "/" + CREATE_JOB_URI, nil
 }
 
 func getSID(resp []byte) (string, error) {
