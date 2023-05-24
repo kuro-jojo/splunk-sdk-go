@@ -31,7 +31,9 @@ func TestSplunkAPI(t *testing.T) {
 		Host:  os.Getenv("SPLUNK_HOST"),
 		Port:  os.Getenv("SPLUNK_PORT"),
 		Token: apiToken,
+		Endpoint: "",
 	}
+
 	// get the metric we want
 	metric, err := GetMetric(client, &sc, search, nil)
 	fmt.Printf("Endpoint : %s\n\n", sc.Endpoint)

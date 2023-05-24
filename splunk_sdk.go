@@ -33,7 +33,7 @@ func GetMetric(client *http.Client, splunkCreds *SplunkCreds, searchQuery string
 	searchQuery = validateSearchQuery(searchQuery)
 	sid, err := postSearch(client, splunkCreds, searchQuery, headers)
 	if err != nil {
-		return -1, fmt.Errorf("error : %s", err)
+		return -1, fmt.Errorf("error with post search : %s", err)
 	}
 
 	newEndpoint := endpoint + sid
@@ -44,7 +44,7 @@ func GetMetric(client *http.Client, splunkCreds *SplunkCreds, searchQuery string
 
 	// the endpoint where to find the corresponding job
 	splunkCreds.Endpoint = newEndpoint + RESULTS_URI
-	logger.Infof("Endpoint : %s\n\n", splunkCreds.Endpoint)
+	logger.Infof("Endpoint : %s", splunkCreds.Endpoint)
 
 	res, err := getSearch(client, splunkCreds, headers)
 	if err != nil {
@@ -151,14 +151,14 @@ func postSearch(client *http.Client, splunkCreds *SplunkCreds, searchQuery strin
 
 	resp, err := post(client, splunkCreds, params, headers)
 	if err != nil {
-		return "", fmt.Errorf("error : %s", err)
+		return "", fmt.Errorf("error while making the post request : %s", err)
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("error : %s", err)
+		return "", fmt.Errorf("error while getting the body of the post request : %s", err)
 	}
 
-	// create the new endpoint for the get request
+	// create the new endpoint for the post request
 	sid, err := getSID(body)
 	if err != nil {
 		return "", fmt.Errorf("error : %s", err)
@@ -175,12 +175,12 @@ func getSearch(client *http.Client, splunkCreds *SplunkCreds, headers map[string
 	// make the get request
 	getResp, err := get(client, splunkCreds, getParams, headers)
 	if err != nil {
-		return nil, fmt.Errorf("error : %s", err)
+		return nil, fmt.Errorf("error while making the get request : %s", err)
 	}
 	// get the body of the response
 	getBody, err := io.ReadAll(getResp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("error : %s", err)
+		return nil, fmt.Errorf("error while getting the body of the get request : %s", err)
 	}
 
 	// get the metric we want
