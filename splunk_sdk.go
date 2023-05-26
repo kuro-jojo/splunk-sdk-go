@@ -1,19 +1,21 @@
-package splunksdk
+package splunksdk_go
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
-	logger "github.com/sirupsen/logrus"
 
+	logger "github.com/sirupsen/logrus"
 )
 
-const CREATE_JOB_URI = "services/search/jobs/"
+const PATH_JOBS_V2 = "services/search/v2/jobs/"
+const PATH_SAVED_SEARCHES = "saved/searches/"
 
 type SplunkCreds struct {
 	Host     string
@@ -22,18 +24,32 @@ type SplunkCreds struct {
 	Endpoint string
 }
 
-func GetMetric(client *http.Client, splunkCreds *SplunkCreds, searchQuery string, headers map[string]string) (float64, error) {
+type SplunkRequest struct {
+	Client  *http.Client
+	Headers map[string]string
+	Params  RequestParams
+}
+
+type RequestParams struct {
+	SearchQuery string
+	OutputMode  string `default:"json"`
+	ExecMode    string `default:"blocking"` // splunk returns a job SID only if the job is complete
+}
+
+// Return a metric from a new created job
+func GetMetricFromNewJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (float64, error) {
 
 	const RESULTS_URI = "results"
-	endpoint, err := CreateJobEndpoint(splunkCreds)
+	endpoint, err := CreateJobEndpoint(spCreds)
 	if err != nil {
-		return -1, err
+		return -1, fmt.Errorf("error while creating the endpoint : %s", err)
 	}
-	splunkCreds.Endpoint = endpoint
-	searchQuery = validateSearchQuery(searchQuery)
-	sid, err := postSearch(client, splunkCreds, searchQuery, headers)
+
+	spCreds.Endpoint = endpoint
+	spRequest.Params.SearchQuery = validateSearchQuery(spRequest.Params.SearchQuery)
+	sid, err := CreateJob(spRequest, spCreds)
 	if err != nil {
-		return -1, fmt.Errorf("error with post search : %s", err)
+		return -1, fmt.Errorf("error while creating the job : %s", err)
 	}
 
 	newEndpoint := endpoint + sid
@@ -43,10 +59,10 @@ func GetMetric(client *http.Client, splunkCreds *SplunkCreds, searchQuery string
 	}
 
 	// the endpoint where to find the corresponding job
-	splunkCreds.Endpoint = newEndpoint + RESULTS_URI
-	logger.Infof("Endpoint : %s", splunkCreds.Endpoint)
+	spCreds.Endpoint = newEndpoint + RESULTS_URI
+	logger.Infof("Endpoint : %s", spCreds.Endpoint)
 
-	res, err := getSearch(client, splunkCreds, headers)
+	res, err := RetrieveJobResult(spRequest, spCreds)
 	if err != nil {
 		return -1, fmt.Errorf("error while handling the results. Error message : %s", err)
 	}
@@ -67,69 +83,14 @@ func GetMetric(client *http.Client, splunkCreds *SplunkCreds, searchQuery string
 	return metric, nil
 }
 
-func CreateJobEndpoint(sc *SplunkCreds) (string, error) {
-	host := sc.Host
-	port := sc.Port
+func post(spRequest *SplunkRequest, spCreds *SplunkCreds) (*http.Response, error) {
 
-	match := `^((localhost)|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}))$`
-
-	if !regexp.MustCompile(match).MatchString(host) {
-		return "", fmt.Errorf("")
-	}
-	return "https://" + host + ":" + port + "/" + CREATE_JOB_URI, nil
+	return httpRequest("POST", spRequest, spCreds)
 }
 
-func getSID(resp []byte) (string, error) {
-	respJson := string(resp)
+func get(spRequest *SplunkRequest, spCreds *SplunkCreds) (*http.Response, error) {
 
-	var sid map[string]string
-	json.Unmarshal([]byte(respJson), &sid)
-	if len(sid) <= 0 {
-		return "", fmt.Errorf("no sid found")
-	}
-	return sid["sid"], nil
-}
-
-func getBearer(token string) string {
-	if !strings.HasPrefix(token, "Bearer") {
-		return "Bearer " + token
-	}
-	return token
-}
-
-func httpRequest(method string, client *http.Client, splunkCreds *SplunkCreds, params url.Values, headers map[string]string) (*http.Response, error) {
-
-	// create a new request
-	req, err := http.NewRequest(method, splunkCreds.Endpoint, strings.NewReader(params.Encode()))
-	if err != nil {
-		return nil, err
-	}
-	// add the headers
-	for header, val := range headers {
-		req.Header.Add(header, val)
-	}
-	if req.Header.Get("Authorization") != "" {
-		req.Header.Add("Authorization", getBearer(splunkCreds.Token))
-	} else {
-		req.Header.Set("Authorization", getBearer(splunkCreds.Token))
-	}
-	// get the response
-	resp, err := client.Do(req)
-	
-	if err != nil {
-		return nil, err
-	}
-	// defer resp.Body.Close()
-	return resp, nil
-}
-func post(client *http.Client, splunkCreds *SplunkCreds, params url.Values, headers map[string]string) (*http.Response, error) {
-
-	return httpRequest("POST", client, splunkCreds, params, headers)
-}
-
-func get(client *http.Client, splunkCreds *SplunkCreds, params url.Values, headers map[string]string) (*http.Response, error) {
-
-	return httpRequest("GET", client, splunkCreds, params, headers)
+	return httpRequest("GET", spRequest, spCreds)
 }
 
 func validateSearchQuery(searchQuery string) string {
@@ -141,15 +102,16 @@ func validateSearchQuery(searchQuery string) string {
 	return searchQuery
 }
 
-func postSearch(client *http.Client, splunkCreds *SplunkCreds, searchQuery string, headers map[string]string) (string, error) {
-	// make the post request
+// this function create a new job and return its SID
+func CreateJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (string, error) {
+
 	// params to send
 	params := url.Values{}
-	params.Add("search", searchQuery)
-	params.Add("output_mode", "json")
-	params.Add("exec_mode", "blocking")
+	params.Add("search", spRequest.Params.SearchQuery)
+	params.Add("output_mode", spRequest.Params.OutputMode)
+	params.Add("exec_mode", spRequest.Params.ExecMode)
 
-	resp, err := post(client, splunkCreds, params, headers)
+	resp, err := post(spRequest, spCreds)
 	if err != nil {
 		return "", fmt.Errorf("error while making the post request : %s", err)
 	}
@@ -167,25 +129,87 @@ func postSearch(client *http.Client, splunkCreds *SplunkCreds, searchQuery strin
 	return sid, nil
 }
 
-func getSearch(client *http.Client, splunkCreds *SplunkCreds, headers map[string]string) ([]map[string]string, error) {
-	// new parameters for the get request
-	getParams := url.Values{}
-	getParams.Add("output_mode", "json")
-
+// return the result of a job get by its SID
+func RetrieveJobResult(spRequest *SplunkRequest, spCreds *SplunkCreds) ([]map[string]string, error) {
 	// make the get request
-	getResp, err := get(client, splunkCreds, getParams, headers)
+	getResp, err := get(spRequest, spCreds)
 	if err != nil {
 		return nil, fmt.Errorf("error while making the get request : %s", err)
 	}
 	// get the body of the response
 	getBody, err := io.ReadAll(getResp.Body)
+
 	if err != nil {
 		return nil, fmt.Errorf("error while getting the body of the get request : %s", err)
 	}
 
-	// get the metric we want
+	// only get the result section of the response
 	var results map[string][]map[string]string
 	json.Unmarshal([]byte(getBody), &results)
 
 	return results["results"], nil
+}
+
+func CreateJobEndpoint(sc *SplunkCreds) (string, error) {
+	host := sc.Host
+	port := sc.Port
+
+	match := `^((localhost)|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}))$`
+
+	if !regexp.MustCompile(match).MatchString(host) {
+		return "", fmt.Errorf("")
+	}
+	return "https://" + net.JoinHostPort(host, port) + "/" + PATH_JOBS_V2, nil
+}
+
+// Return the sid from the body of the given response
+func getSID(resp []byte) (string, error) {
+	respJson := string(resp)
+
+	var sid map[string]string
+	json.Unmarshal([]byte(respJson), &sid)
+
+	if len(sid) <= 0 {
+		return "", fmt.Errorf("no sid found")
+	}
+	return sid["sid"], nil
+}
+
+func getBearer(token string) string {
+	if !strings.HasPrefix(token, "Bearer") {
+		return "Bearer " + token
+	}
+	return token
+}
+
+func httpRequest(method string, spRequest *SplunkRequest, spCreds *SplunkCreds) (*http.Response, error) {
+
+	// parameters of the request
+	params := url.Values{}
+	params.Add("search", spRequest.Params.SearchQuery)
+	params.Add("output_mode", spRequest.Params.OutputMode)
+	params.Add("exec_mode", spRequest.Params.ExecMode)
+
+	// create a new request
+	req, err := http.NewRequest(method, spCreds.Endpoint, strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	// add the headers
+	for header, val := range spRequest.Headers {
+		req.Header.Add(header, val)
+	}
+	if req.Header.Get("Authorization") != "" {
+		req.Header.Add("Authorization", getBearer(spCreds.Token))
+	} else {
+		req.Header.Set("Authorization", getBearer(spCreds.Token))
+	}
+	// get the response
+	resp, err := spRequest.Client.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+	// defer resp.Body.Close()
+	return resp, nil
 }
