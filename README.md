@@ -1,0 +1,1 @@
+# Splunk SDK for go 
