@@ -26,16 +26,3 @@ jobs:
 
     - name: Test
       run: go test -v ./...
-  deploy:
-    needs: build 
-    name: Deploy on docker Hub    
-
-    runs-on: ubuntu-latest
-    steps:
-      - uses: mr-smithers-excellent/docker-build-push@v6
-        with:
-          image: kuro08/splunk-sdk-go
-          registry: docker.io
-          dockerfile: ./Dockerfile
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
