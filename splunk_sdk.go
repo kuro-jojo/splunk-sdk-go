@@ -48,6 +48,7 @@ func GetMetricFromNewJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (float6
 		}
 	}
 	const RESULTS_URI = "results"
+
 	endpoint, err := CreateJobEndpoint(spCreds)
 	if err != nil {
 		return -1, fmt.Errorf("error while creating the endpoint : %s", err)
@@ -168,6 +169,7 @@ func CreateJobEndpoint(sc *SplunkCreds) (string, error) {
 	if !regexp.MustCompile(match).MatchString(host) {
 		return "", fmt.Errorf("")
 	}
+	
 	return "https://" + net.JoinHostPort(host, port) + "/" + PATH_JOBS_V2, nil
 }
 
@@ -206,14 +208,16 @@ func httpRequest(method string, spRequest *SplunkRequest, spCreds *SplunkCreds) 
 		return nil, err
 	}
 	// add the headers
-	for header, val := range spRequest.Headers {
-		req.Header.Add(header, val)
-	}
-	if req.Header.Get("Authorization") != "" {
-		spRequest.Headers["Authorization"] = getBearer(spCreds.Token)
-		req.Header.Add("Authorization", getBearer(spCreds.Token))
+
+	if spRequest.Headers == nil {
+		spRequest.Headers = map[string]string{
+			"Authorization": getBearer(spCreds.Token),
+		}
 	} else {
-		spRequest.Headers["Authorization"] = getBearer(spCreds.Token)
+		for header, val := range spRequest.Headers {
+			req.Header.Add(header, val)
+		}
+
 		req.Header.Set("Authorization", getBearer(spCreds.Token))
 	}
 	// get the response

@@ -41,6 +41,7 @@ func TestGetMetric(t *testing.T) {
 			Timeout:   time.Duration(1) * time.Second,
 		},
 		Params: params,
+		Headers: make(map[string]string),
 	}
 	sc := SplunkCreds{
 		Host:     strings.Split(strings.Split(server.URL, ":")[1], "//")[1],
@@ -79,6 +80,7 @@ func TestCreateJob(t *testing.T) {
 			Timeout:   time.Duration(1) * time.Second,
 		},
 		Params: params,
+		// Headers: make(map[string]string),
 	}
 	sc := SplunkCreds{
 		Host:     strings.Split(strings.Split(server.URL, ":")[1], "//")[1],
@@ -123,6 +125,7 @@ func TestRetrieveJobResult(t *testing.T) {
 			Timeout:   time.Duration(1) * time.Second,
 		},
 		Params: params,
+		Headers: make(map[string]string),
 	}
 	sc := SplunkCreds{
 		Host:     strings.Split(strings.Split(server.URL, ":")[1], "//")[1],
