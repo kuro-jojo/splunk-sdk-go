@@ -10,8 +10,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	logger "github.com/sirupsen/logrus"
 )
 
 const PATH_JOBS_V2 = "services/search/v2/jobs/"
@@ -60,7 +58,6 @@ func GetMetricFromNewJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (float6
 
 	// the endpoint where to find the corresponding job
 	spCreds.Endpoint = newEndpoint + RESULTS_URI
-	logger.Infof("Endpoint : %s", spCreds.Endpoint)
 
 	res, err := RetrieveJobResult(spRequest, spCreds)
 	if err != nil {
