@@ -2,7 +2,7 @@ FROM golang:latest
 
 WORKDIR /app
 
-COPY . ./
+COPY . .
 
 RUN go mod download
 
