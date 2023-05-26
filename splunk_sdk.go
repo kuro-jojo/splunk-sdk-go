@@ -7,12 +7,9 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
-
-	logger "github.com/sirupsen/logrus"
 )
 
 const PATH_JOBS_V2 = "services/search/v2/jobs/"
@@ -39,14 +36,7 @@ type RequestParams struct {
 
 // Return a metric from a new created job
 func GetMetricFromNewJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (float64, error) {
-	if os.Getenv("LOG_LEVEL") != "" {
-		logLevel, err := logger.ParseLevel(os.Getenv("LOG_LEVEL"))
-		if err != nil {
-			logger.WithError(err).Error("could not parse log level provided by 'LOG_LEVEL' env var")
-		} else {
-			logger.SetLevel(logLevel)
-		}
-	}
+
 	const RESULTS_URI = "results"
 
 	endpoint, err := CreateJobEndpoint(spCreds)
@@ -126,8 +116,6 @@ func CreateJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (string, error) {
 	params.Add("output_mode", spRequest.Params.OutputMode)
 	params.Add("exec_mode", spRequest.Params.ExecMode)
 
-	logger.Infof("IN CREATE JOB PAR: %v", params)
-	logger.Infof("IN CREATE JOB : %v", spRequest)
 	resp, err := post(spRequest, spCreds)
 	if err != nil {
 		return "", fmt.Errorf("error while making the post request : %s", err)
@@ -186,8 +174,7 @@ func getSID(resp []byte) (string, error) {
 
 	var sid map[string]string
 	json.Unmarshal([]byte(respJson), &sid)
-	logger.Infof("IN GET SID : %s", resp)
-	logger.Infof("IN GET SID2 : %s", sid)
+
 	if len(sid) <= 0 {
 		return "", fmt.Errorf("no sid found")
 	}
