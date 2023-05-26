@@ -116,10 +116,17 @@ func CreateJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (string, error) {
 	// params to send
 	params := url.Values{}
 	params.Add("search", spRequest.Params.SearchQuery)
+	if spRequest.Params.OutputMode == "" {
+		spRequest.Params.OutputMode = "json"
+	}
+	if spRequest.Params.ExecMode == "" {
+		spRequest.Params.ExecMode = "blocking"
+	}
+
 	params.Add("output_mode", spRequest.Params.OutputMode)
 	params.Add("exec_mode", spRequest.Params.ExecMode)
 
-	logger.Infof("IN CREATE JOB : %v", spCreds)
+	logger.Infof("IN CREATE JOB PAR: %v", params)
 	logger.Infof("IN CREATE JOB : %v", spRequest)
 	resp, err := post(spRequest, spCreds)
 	if err != nil {
@@ -169,7 +176,7 @@ func CreateJobEndpoint(sc *SplunkCreds) (string, error) {
 	if !regexp.MustCompile(match).MatchString(host) {
 		return "", fmt.Errorf("")
 	}
-	
+
 	return "https://" + net.JoinHostPort(host, port) + "/" + PATH_JOBS_V2, nil
 }
 
@@ -179,8 +186,8 @@ func getSID(resp []byte) (string, error) {
 
 	var sid map[string]string
 	json.Unmarshal([]byte(respJson), &sid)
-	logger.Infof("IN GET SID : %v", resp)
-	logger.Infof("IN GET SID : %s", respJson)
+	logger.Infof("IN GET SID : %s", resp)
+	logger.Infof("IN GET SID2 : %s", sid)
 	if len(sid) <= 0 {
 		return "", fmt.Errorf("no sid found")
 	}
