@@ -36,6 +36,6 @@ jobs:
         with:
           image: kuro08/splunk-sdk-go
           registry: docker.io
-          dockerfile: Dockerfile
+          dockerfile: .
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
