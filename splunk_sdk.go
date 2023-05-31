@@ -7,9 +7,12 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 const PATH_JOBS_V2 = "services/search/v2/jobs/"
@@ -42,7 +45,14 @@ type RequestParams struct {
 
 // Return a metric from a new created job
 func GetMetricFromNewJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (float64, error) {
-
+	if os.Getenv("LOG_LEVEL") != "" {
+		logLevel, err := logger.ParseLevel(os.Getenv("LOG_LEVEL"))
+		if err != nil {
+			logger.WithError(err).Error("could not parse log level provided by 'LOG_LEVEL' env var")
+		} else {
+			logger.SetLevel(logLevel)
+		}
+	}
 	const RESULTS_URI = "results"
 
 	endpoint, err := CreateJobEndpoint(spCreds)
@@ -240,5 +250,7 @@ func handleHttpError(body []byte) (string, error) {
 	var bodyJson map[string][]map[string]string
 	json.Unmarshal([]byte(body), &bodyJson)
 
+	logger.Info(body, bodyJson)
+	logger.Info(body, len(bodyJson))
 	return bodyJson["messages"][0]["text"], nil
 }
