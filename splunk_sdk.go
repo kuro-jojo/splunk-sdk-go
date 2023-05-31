@@ -132,6 +132,8 @@ func CreateJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (string, error) {
 		status, err := handleHttpError(body)
 		if err == nil {
 			return "", fmt.Errorf("http error :  %s", status)
+		} else {
+			return "", fmt.Errorf("http error :  %s", resp.Status)
 		}
 	}
 
@@ -250,12 +252,8 @@ func handleHttpError(body []byte) (string, error) {
 	var bodyJson map[string][]map[string]string
 	json.Unmarshal([]byte(body), &bodyJson)
 
-	logger.Infof("Body : %s, json : %s",body, bodyJson)
-	logger.Infof("Body : %s, json : %s",body, len(bodyJson))
-	logger.Info(len(bodyJson))
-	if len(bodyJson)>1{
+	if len(bodyJson) > 1 {
 		return bodyJson["messages"][0]["text"], nil
-
 	}
-	return string(body), nil
+	return "", fmt.Errorf("incorrect format")
 }
