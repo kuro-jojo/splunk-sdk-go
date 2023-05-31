@@ -250,7 +250,8 @@ func handleHttpError(body []byte) (string, error) {
 	var bodyJson map[string][]map[string]string
 	json.Unmarshal([]byte(body), &bodyJson)
 
-	logger.Info(body, bodyJson)
-	logger.Info(body, len(bodyJson))
+	logger.Infof("Body : %s, json : %s",body, bodyJson)
+	logger.Infof("Body : %s, json : %s",body, len(bodyJson))
+	logger.Info(len(bodyJson))
 	return bodyJson["messages"][0]["text"], nil
 }
