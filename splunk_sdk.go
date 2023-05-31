@@ -29,6 +29,7 @@ type SplunkRequest struct {
 }
 
 type RequestParams struct {
+	// splunk search in spl syntax
 	SearchQuery string
 	OutputMode  string `default:"json"`
 	// splunk returns a job SID only if the job is complete
