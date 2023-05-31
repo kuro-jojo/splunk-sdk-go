@@ -31,7 +31,12 @@ type SplunkRequest struct {
 type RequestParams struct {
 	SearchQuery string
 	OutputMode  string `default:"json"`
-	ExecMode    string `default:"blocking"` // splunk returns a job SID only if the job is complete
+	// splunk returns a job SID only if the job is complete
+	ExecMode string `default:"blocking"`
+	// earliest (inclusive) time bounds for the search
+	EarliestTime string
+	// latest (exclusive) time bounds for the search
+	LatestTime string
 }
 
 // Return a metric from a new created job
@@ -61,12 +66,13 @@ func GetMetricFromNewJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (float6
 	spCreds.Endpoint = newEndpoint + RESULTS_URI
 
 	res, err := RetrieveJobResult(spRequest, spCreds)
+
 	if err != nil {
 		return -1, fmt.Errorf("error while handling the results. Error message : %s", err)
 	}
 	// if the result is not a metric
 	if len(res) != 1 {
-		return -1, fmt.Errorf("incorrect search result. Error message : %v", err)
+		return -1, fmt.Errorf("result is not a metric. Error message : %v", err)
 	}
 	var metrics []string
 
@@ -103,24 +109,21 @@ func validateSearchQuery(searchQuery string) string {
 // this function create a new job and return its SID
 func CreateJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (string, error) {
 
-	// params to send
-	params := url.Values{}
-	params.Add("search", spRequest.Params.SearchQuery)
-	if spRequest.Params.OutputMode == "" {
-		spRequest.Params.OutputMode = "json"
-	}
-	if spRequest.Params.ExecMode == "" {
-		spRequest.Params.ExecMode = "blocking"
-	}
-
-	params.Add("output_mode", spRequest.Params.OutputMode)
-	params.Add("exec_mode", spRequest.Params.ExecMode)
-
 	resp, err := post(spRequest, spCreds)
+
 	if err != nil {
 		return "", fmt.Errorf("error while making the post request : %s", err)
 	}
+
 	body, err := io.ReadAll(resp.Body)
+	// handle error
+	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
+		status, err := handleHttpError(body)
+		if err == nil {
+			return "", fmt.Errorf("http error :  %s", status)
+		}
+	}
+
 	if err != nil {
 		return "", fmt.Errorf("error while getting the body of the post request : %s", err)
 	}
@@ -192,9 +195,18 @@ func httpRequest(method string, spRequest *SplunkRequest, spCreds *SplunkCreds) 
 
 	// parameters of the request
 	params := url.Values{}
-	params.Add("search", spRequest.Params.SearchQuery)
-	params.Add("output_mode", spRequest.Params.OutputMode)
-	params.Add("exec_mode", spRequest.Params.ExecMode)
+	if spRequest.Params.OutputMode == "" {
+		spRequest.Params.OutputMode = "json"
+	}
+	if spRequest.Params.ExecMode == "" {
+		spRequest.Params.ExecMode = "blocking"
+	}
+
+	if method == "POST" {
+		params.Add("search", spRequest.Params.SearchQuery)
+		params.Add("earliest_time", spRequest.Params.EarliestTime)
+		params.Add("latest_time", spRequest.Params.LatestTime)
+	}
 
 	// create a new request
 	req, err := http.NewRequest(method, spCreds.Endpoint, strings.NewReader(params.Encode()))
@@ -202,24 +214,30 @@ func httpRequest(method string, spRequest *SplunkRequest, spCreds *SplunkCreds) 
 		return nil, err
 	}
 	// add the headers
-
 	if spRequest.Headers == nil {
 		spRequest.Headers = map[string]string{
 			"Authorization": getBearer(spCreds.Token),
 		}
-	} else {
-		for header, val := range spRequest.Headers {
-			req.Header.Add(header, val)
-		}
-
-		req.Header.Set("Authorization", getBearer(spCreds.Token))
 	}
+	for header, val := range spRequest.Headers {
+		req.Header.Add(header, val)
+	}
+
 	// get the response
 	resp, err := spRequest.Client.Do(req)
 
 	if err != nil {
 		return nil, err
 	}
-	// defer resp.Body.Close()
+
 	return resp, nil
+}
+
+// return the message of the error when got http error
+func handleHttpError(body []byte) (string, error) {
+
+	var bodyJson map[string][]map[string]string
+	json.Unmarshal([]byte(body), &bodyJson)
+
+	return bodyJson["messages"][0]["text"], nil
 }

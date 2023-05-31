@@ -15,7 +15,9 @@ func TestGetMetric(t *testing.T) {
 	}
 	// params for the request
 	params := RequestParams{
-		SearchQuery: "source=/opt/splunk/var/log/secure.log sourcetype=osx_secure |stats count",
+		SearchQuery:  "source=/opt/splunk/var/log/secure.log sourcetype=osx_secure |stats count",
+		EarliestTime: "-5m",
+		LatestTime:   "-1m",
 	}
 	jsonResponsePOST := `{
 		"sid": "10"
@@ -50,6 +52,7 @@ func TestGetMetric(t *testing.T) {
 	}
 
 	metric, err := GetMetricFromNewJob(&spReq, &sc)
+
 	if err != nil {
 		t.Fatalf("Got an error : %s", err)
 	}
@@ -65,7 +68,9 @@ func TestCreateJob(t *testing.T) {
 	}
 	// params for the request
 	params := RequestParams{
-		SearchQuery: "source=/opt/splunk/var/log/secure.log sourcetype=osx_secure |stats count",
+		SearchQuery:  "source=/opt/splunk/var/log/secure.log sourcetype=osx_secure |stats count",
+		EarliestTime: "-1y@w1",
+		LatestTime:   "-500h",
 	}
 	jsonResponsePOST := `{
 		"sid": "10"
