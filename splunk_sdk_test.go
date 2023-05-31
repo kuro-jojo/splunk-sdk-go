@@ -45,10 +45,10 @@ func TestGetMetric(t *testing.T) {
 		Params: params,
 	}
 	sc := SplunkCreds{
-		Host:     strings.Split(strings.Split(server.URL, ":")[1], "//")[1],
-		Port:     strings.Split(server.URL, ":")[2],
-		Token:    "apiToken",
-		Endpoint: "",
+		Host:  "172.29.226.241",
+		Port:  "80489",
+		Token: "eyJraWQiOiJzcGx1bmsuc2VjcmV0IiwiYWxnIjoiSFM1MTIiLCJ2ZXIiOiJ2MiIsInR0eXAiOiJzdGF0aWMifQ.eyJpc3MiOiJhZG1pbiBmcm9tIE5DRUwxNDExOTIiLCJzdWIiOiJhZG1pbiIsImF1ZCI6InRlc3QiLCJpZHAiOiJTcGx1bmsiLCJqdGkiOiI2MTE5ZjE3NmExZmEyMmZkZjA1MTM5M2JhNDJkZTA0OTczZTBlMjFkOTRmYjcyNDdmYzQwZTAzYmJhYWIwZTdhIiwiaWF0IjoxNjg1NTM2MjIzLCJleHAiOjE2ODgxMjgyMjMsIm5iciI6MTY4NTUzNjIyM30.gx_mxwT6xdKoiP2Mrh_DsHcGHyxG9RlBusAaZlLOA9n-U8J6gmWQCMkTcvrEtR6l5LdvsLZ0BW8n06bNrAIEYw",
+		// Endpoint: "",
 	}
 
 	metric, err := GetMetricFromNewJob(&spReq, &sc)

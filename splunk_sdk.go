@@ -253,5 +253,9 @@ func handleHttpError(body []byte) (string, error) {
 	logger.Infof("Body : %s, json : %s",body, bodyJson)
 	logger.Infof("Body : %s, json : %s",body, len(bodyJson))
 	logger.Info(len(bodyJson))
-	return bodyJson["messages"][0]["text"], nil
+	if len(bodyJson)>1{
+		return bodyJson["messages"][0]["text"], nil
+
+	}
+	return string(body), nil
 }
