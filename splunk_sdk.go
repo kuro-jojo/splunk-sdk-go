@@ -7,12 +7,9 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
-
-	logger "github.com/sirupsen/logrus"
 )
 
 const PATH_JOBS_V2 = "services/search/v2/jobs/"
@@ -45,14 +42,7 @@ type RequestParams struct {
 
 // Return a metric from a new created job
 func GetMetricFromNewJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (float64, error) {
-	if os.Getenv("LOG_LEVEL") != "" {
-		logLevel, err := logger.ParseLevel(os.Getenv("LOG_LEVEL"))
-		if err != nil {
-			logger.WithError(err).Error("could not parse log level provided by 'LOG_LEVEL' env var")
-		} else {
-			logger.SetLevel(logLevel)
-		}
-	}
+
 	const RESULTS_URI = "results"
 
 	endpoint, err := CreateJobEndpoint(spCreds)
@@ -128,10 +118,6 @@ func CreateJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (string, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	// handle error
-	logger.Infof("in create JOB body: %s", body)
-	logger.Infof("in create JOB creds : %v", spCreds)
-	logger.Infof("in create JOB req: %v", spRequest)
-	
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := handleHttpError(body)
 		if err == nil {
@@ -224,8 +210,12 @@ func httpRequest(method string, spRequest *SplunkRequest, spCreds *SplunkCreds) 
 
 	if method == "POST" {
 		params.Add("search", spRequest.Params.SearchQuery)
-		params.Add("earliest_time", spRequest.Params.EarliestTime)
-		params.Add("latest_time", spRequest.Params.LatestTime)
+		if spRequest.Params.EarliestTime != "" {
+			params.Add("earliest_time", spRequest.Params.EarliestTime)
+		}
+		if spRequest.Params.LatestTime != "" {
+			params.Add("latest_time", spRequest.Params.LatestTime)
+		}
 	}
 
 	// create a new request
