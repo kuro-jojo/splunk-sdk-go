@@ -128,6 +128,10 @@ func CreateJob(spRequest *SplunkRequest, spCreds *SplunkCreds) (string, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	// handle error
+	logger.Infof("in create JOB body: %s", body)
+	logger.Infof("in create JOB creds : %v", spCreds)
+	logger.Infof("in create JOB req: %v", spRequest)
+	
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := handleHttpError(body)
 		if err == nil {
