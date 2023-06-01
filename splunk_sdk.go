@@ -206,14 +206,17 @@ func getBearer(token string) string {
 
 func httpRequest(method string, spRequest *SplunkRequest, spCreds *SplunkCreds) (*http.Response, error) {
 
-	// parameters of the request
-	params := url.Values{}
 	if spRequest.Params.OutputMode == "" {
 		spRequest.Params.OutputMode = "json"
 	}
 	if spRequest.Params.ExecMode == "" {
 		spRequest.Params.ExecMode = "blocking"
 	}
+
+	// parameters of the request
+	params := url.Values{}
+	params.Add("output_mode", spRequest.Params.OutputMode)
+	params.Add("exec_mode", spRequest.Params.ExecMode)
 
 	if method == "POST" {
 		params.Add("search", spRequest.Params.SearchQuery)
@@ -228,10 +231,11 @@ func httpRequest(method string, spRequest *SplunkRequest, spCreds *SplunkCreds) 
 	}
 	// add the headers
 	if spRequest.Headers == nil {
-		spRequest.Headers = map[string]string{
-			"Authorization": getBearer(spCreds.Token),
-		}
+		spRequest.Headers = map[string]string{}
 	}
+
+	spRequest.Headers["Authorization"] = getBearer(spCreds.Token)
+
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
