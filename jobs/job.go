@@ -109,8 +109,9 @@ func RetrieveJobResult(client *splunk.SplunkClient, spRequest *splunk.SplunkRequ
 
 	var results map[string][]map[string]string
 	errUmarshall := json.Unmarshal([]byte(getBody), &results)
+	
 	if errUmarshall != nil {
-		return nil, fmt.Errorf(errUmarshall.Error(), string(getBody), string(getResp.Status))
+		return nil, fmt.Errorf("body %v and %s and %v ", errUmarshall.Error(), getBody, getResp.Status)
 	}
 	return results["results"], nil
 }
