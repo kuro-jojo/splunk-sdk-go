@@ -74,6 +74,9 @@ func GetJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (*http
 
 func HttpSearchRequest(client *splunk.SplunkClient, method string, spRequest *splunk.SplunkRequest) (*http.Response, error) {
 
+	spRequest.Params.OutputMode = "json"
+	spRequest.Params.ExecMode = "blocking"
+
 	// parameters of the request
 	params := url.Values{}
 	params.Add("output_mode", spRequest.Params.OutputMode)

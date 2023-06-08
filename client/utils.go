@@ -60,12 +60,6 @@ func HandleHttpError(body []byte) (string, error) {
 
 func MakeHttpRequest(client *SplunkClient, method string, spRequest *SplunkRequest, params url.Values) (*http.Response, error) {
 
-	if spRequest.Params.OutputMode == "" {
-		spRequest.Params.OutputMode = "json"
-	}
-	if spRequest.Params.ExecMode == "" {
-		spRequest.Params.ExecMode = "blocking"
-	}
 	// create a new request
 	req, err := http.NewRequest(method, client.Endpoint, strings.NewReader(params.Encode()))
 	if err != nil {
