@@ -1,9 +1,8 @@
-package splunksdk_go
+package tests
 
 import (
 	"crypto/tls"
 	"net/http"
-	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -134,10 +133,10 @@ func TestRetrieveJobResult(t *testing.T) {
 			Transport: tr,
 			Timeout:   time.Duration(60) * time.Second,
 		},
-		Host:     strings.Split(strings.Split(server.URL, ":")[1], "//")[1],
-		Port:     strings.Split(server.URL, ":")[2],
-		SessionKey:    "sessionKey",
-		Endpoint: "",
+		Host:       strings.Split(strings.Split(server.URL, ":")[1], "//")[1],
+		Port:       strings.Split(server.URL, ":")[2],
+		SessionKey: "sessionKey",
+		Endpoint:   "",
 	}
 
 	endpoint, err := job.CreateJobEndpoint(&client)
@@ -159,27 +158,4 @@ func TestRetrieveJobResult(t *testing.T) {
 	if sid[0]["count"] != expectedRes[0]["count"] {
 		t.Errorf("Expected %v but got %v.", expectedRes, sid)
 	}
-}
-
-func MockRequest(response string) *httptest.Server {
-	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		_, _ = w.Write([]byte(response))
-	}))
-	return server
-}
-
-func MutitpleMockRequest(responses []map[string]interface{}) *httptest.Server {
-	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		for _, response := range responses {
-			if response["POST"] != nil && r.Method == "POST" {
-				_, _ = w.Write([]byte(response["POST"].(string)))
-			}
-			if response["GET"] != nil && r.Method == "GET" {
-				_, _ = w.Write([]byte(response["GET"].(string)))
-			}
-		}
-	}))
-	return server
 }
