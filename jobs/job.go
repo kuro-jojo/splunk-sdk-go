@@ -106,10 +106,11 @@ func RetrieveJobResult(client *splunk.SplunkClient, spRequest *splunk.SplunkRequ
 	}
 
 	// only get the result section of the response
+
 	var results map[string][]map[string]string
 	errUmarshall := json.Unmarshal([]byte(getBody), &results)
 	if errUmarshall != nil {
-		return nil, errUmarshall
+		return nil, fmt.Errorf(errUmarshall.Error(), string(getBody))
 	}
 	return results["results"], nil
 }

@@ -65,6 +65,7 @@ func TestGetMetric(t *testing.T) {
 		t.Errorf("Expected %v but got %v.", expectedMetric, metric)
 	}
 }
+
 func TestCreateJob(t *testing.T) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -167,6 +168,7 @@ func MockRequest(response string) *httptest.Server {
 	}))
 	return server
 }
+
 func MutitpleMockRequest(responses []map[string]interface{}) *httptest.Server {
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
