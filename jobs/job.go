@@ -106,14 +106,22 @@ func RetrieveJobResult(client *splunk.SplunkClient, spRequest *splunk.SplunkRequ
 	}
 
 	// only get the result section of the response
+	// {"preview":false,"init_offset":0,"messages":[],"fields":[{"name":"count"}],"results":[{"count":"0"}], "highlighted":{}}
+	type Response struct {
+		preview     bool
+		init_offset int
+		messages    []string
+		fields      []map[string]string
+		Results      []map[string]string `json:"results"`
+	}
 
-	var results map[string][]map[string]string
+	results := Response{}
 	errUmarshall := json.Unmarshal([]byte(getBody), &results)
-	
+
 	if errUmarshall != nil {
 		return nil, fmt.Errorf("body %v and %s and %v ", errUmarshall.Error(), getBody, getResp.Status)
 	}
-	return results["results"], nil
+	return results.Results, nil
 }
 
 // Return the sid from the body of the given response
