@@ -1,11 +1,9 @@
 package jobs
 
 import (
-	"fmt"
 	"net"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strings"
 
 	splunk "github.com/kuro-jojo/splunk-sdk-go/client"
@@ -53,7 +51,7 @@ func CreateJobEndpoint(client *splunk.SplunkClient) (string, error) {
 	host := client.Host
 	port := client.Port
 
-	// TODO : match every possible url 
+	// TODO : match every possible url
 	// match := `^((localhost)|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}))$`
 
 	// if !regexp.MustCompile(match).MatchString(host) {
