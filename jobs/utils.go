@@ -53,11 +53,12 @@ func CreateJobEndpoint(client *splunk.SplunkClient) (string, error) {
 	host := client.Host
 	port := client.Port
 
-	match := `^((localhost)|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}))$`
+	// TODO : match every possible url 
+	// match := `^((localhost)|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}))$`
 
-	if !regexp.MustCompile(match).MatchString(host) {
-		return "", fmt.Errorf("")
-	}
+	// if !regexp.MustCompile(match).MatchString(host) {
+	// 	return "", fmt.Errorf("")
+	// }
 
 	return "https://" + net.JoinHostPort(host, port) + "/" + PATH_JOBS_V2, nil
 }
