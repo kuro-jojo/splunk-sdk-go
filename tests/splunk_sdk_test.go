@@ -36,7 +36,7 @@ func TestGetMetric(t *testing.T) {
 	responses[1] = map[string]interface{}{
 		"GET": jsonResponseGET,
 	}
-	server := MutitpleMockRequest(responses)
+	server := MutitpleMockRequest(responses, true)
 	defer server.Close()
 
 	spReq := splunk.SplunkRequest{
@@ -78,7 +78,7 @@ func TestCreateJob(t *testing.T) {
 	jsonResponsePOST := `{
 		"sid": "10"
 	}`
-	server := MockRequest(jsonResponsePOST)
+	server := MockRequest(jsonResponsePOST, true)
 	defer server.Close()
 
 	spReq := splunk.SplunkRequest{
@@ -122,7 +122,7 @@ func TestRetrieveJobResult(t *testing.T) {
 	jsonResponseGET := `{
 		"results":[{"count":"1250"}]
 	}`
-	server := MockRequest(jsonResponseGET)
+	server := MockRequest(jsonResponseGET, true)
 	defer server.Close()
 
 	spReq := splunk.SplunkRequest{
