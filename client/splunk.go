@@ -36,7 +36,7 @@ type SplunkClient struct {
 }
 
 // create a new Client
-func NewClient(client *http.Client, host string, port string, endpoint string, token string, username string, password string, sessionKey string, skipSSL bool) *SplunkClient {
+func NewClient(client *http.Client, host string, port string, token string, username string, password string, sessionKey string, skipSSL bool) *SplunkClient {
 	if skipSSL {
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -48,7 +48,6 @@ func NewClient(client *http.Client, host string, port string, endpoint string, t
 		Client:     client,
 		Host:       host,
 		Port:       port,
-		Endpoint:   endpoint,
 		Token:      token,
 		Username:   username,
 		Password:   password,
@@ -58,7 +57,7 @@ func NewClient(client *http.Client, host string, port string, endpoint string, t
 }
 
 // create a new client that could connect with authentication tokens
-func NewClientAuthenticatedByToken(client *http.Client, host string, port string, endpoint string, token string, skipSSL bool) *SplunkClient {
+func NewClientAuthenticatedByToken(client *http.Client, host string, port string, token string, skipSSL bool) *SplunkClient {
 	if skipSSL {
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -70,7 +69,6 @@ func NewClientAuthenticatedByToken(client *http.Client, host string, port string
 		Client:     client,
 		Host:       host,
 		Port:       port,
-		Endpoint:   endpoint,
 		Token:      token,
 		Username:   "",
 		Password:   "",
@@ -80,7 +78,7 @@ func NewClientAuthenticatedByToken(client *http.Client, host string, port string
 }
 
 // create a new client that could connect with authentication sessionKey
-func NewClientAuthenticatedBySessionKey(client *http.Client, host string, port string, endpoint string, sessionKey string, skipSSL bool) *SplunkClient {
+func NewClientAuthenticatedBySessionKey(client *http.Client, host string, port string, sessionKey string, skipSSL bool) *SplunkClient {
 	if skipSSL {
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -92,7 +90,6 @@ func NewClientAuthenticatedBySessionKey(client *http.Client, host string, port s
 		Client:     client,
 		Host:       host,
 		Port:       port,
-		Endpoint:   endpoint,
 		SessionKey: sessionKey,
 		Token:      "",
 		Username:   "",
