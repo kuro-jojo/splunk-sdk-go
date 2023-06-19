@@ -40,6 +40,7 @@ func CreateAuthenticationKey(client *SplunkClient) (string, error) {
 	} else if client.Username != "" && client.Password != "" {
 		return base64.StdEncoding.EncodeToString([]byte(client.Username + ":" + client.Password)), nil
 	}
+	
 	return "", fmt.Errorf("no authentication method provided")
 }
 

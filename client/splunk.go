@@ -1,6 +1,9 @@
 package client
 
-import "net/http"
+import (
+	"crypto/tls"
+	"net/http"
+)
 
 type SplunkRequest struct {
 	Headers map[string]string
@@ -33,8 +36,16 @@ type SplunkClient struct {
 }
 
 // create a new Client
-func NewClient(host string, port string, endpoint string, token string, username string, password string, sessionKey string, skipSSL bool) *SplunkClient {
+func NewClient(client *http.Client, host string, port string, endpoint string, token string, username string, password string, sessionKey string, skipSSL bool) *SplunkClient {
+	if skipSSL {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client.Transport = tr
+	}
+
 	return &SplunkClient{
+		Client:     client,
 		Host:       host,
 		Port:       port,
 		Endpoint:   endpoint,
@@ -47,8 +58,16 @@ func NewClient(host string, port string, endpoint string, token string, username
 }
 
 // create a new client that could connect with authentication tokens
-func NewClientAuthenticatedByToken(host string, port string, endpoint string, token string, skipSSL bool) *SplunkClient {
+func NewClientAuthenticatedByToken(client *http.Client, host string, port string, endpoint string, token string, skipSSL bool) *SplunkClient {
+	if skipSSL {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client.Transport = tr
+	}
+
 	return &SplunkClient{
+		Client:     client,
 		Host:       host,
 		Port:       port,
 		Endpoint:   endpoint,
@@ -61,8 +80,16 @@ func NewClientAuthenticatedByToken(host string, port string, endpoint string, to
 }
 
 // create a new client that could connect with authentication sessionKey
-func NewClientAuthenticatedBySessionKey(host string, port string, endpoint string, sessionKey string, skipSSL bool) *SplunkClient {
+func NewClientAuthenticatedBySessionKey(client *http.Client, host string, port string, endpoint string, sessionKey string, skipSSL bool) *SplunkClient {
+	if skipSSL {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client.Transport = tr
+	}
+
 	return &SplunkClient{
+		Client:     client,
 		Host:       host,
 		Port:       port,
 		Endpoint:   endpoint,
@@ -75,8 +102,16 @@ func NewClientAuthenticatedBySessionKey(host string, port string, endpoint strin
 }
 
 // create a new client with basic authentication method
-func NewBasicAuthenticatedClient(host string, port string, username string, password string, skipSSL bool) *SplunkClient {
+func NewBasicAuthenticatedClient(client *http.Client, host string, port string, username string, password string, skipSSL bool) *SplunkClient {
+	if skipSSL {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client.Transport = tr
+	}
+
 	return &SplunkClient{
+		Client:     client,
 		Host:       host,
 		Port:       port,
 		Username:   username,

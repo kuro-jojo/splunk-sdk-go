@@ -72,9 +72,9 @@ func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (st
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := splunk.HandleHttpError(body)
 		if err == nil {
-			return "", fmt.Errorf("http error :  %s", status)
+			return "", fmt.Errorf("http error :  %s and %v", status, spRequest.Params)
 		} else {
-			return "", fmt.Errorf("http error :  %s", resp.Status)
+			return "", fmt.Errorf("http error :  %s and %v", resp.Status, spRequest.Params)
 		}
 	}
 

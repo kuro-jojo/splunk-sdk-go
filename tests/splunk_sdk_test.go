@@ -17,9 +17,7 @@ func TestGetMetric(t *testing.T) {
 	}
 	// params for the request
 	params := splunk.RequestParams{
-		SearchQuery:  "source=/opt/splunk/var/log/secure.log sourcetype=osx_secure |stats count",
-		EarliestTime: "-5m",
-		LatestTime:   "-1m",
+		SearchQuery:  "source=\"http:podtato-error\" (index=\"keptn-splunk-dev\") \"[error]\" earliest=\"6/14/2023:18:00:00\" latest=\"6/15/2023:8:00:00\" | stats count",
 	}
 	jsonResponsePOST := `{
 		"sid": "10"
@@ -47,10 +45,9 @@ func TestGetMetric(t *testing.T) {
 			Transport: tr,
 			Timeout:   time.Duration(60) * time.Second,
 		},
-		Host:     strings.Split(strings.Split(server.URL, ":")[1], "//")[1],
-		Port:     strings.Split(server.URL, ":")[2],
-		Token:    "apiToken",
-		Endpoint: "",
+		Host:     "172.29.226.241",
+		Port:     "8089",
+		Token:    "eyJraWQiOiJzcGx1bmsuc2VjcmV0IiwiYWxnIjoiSFM1MTIiLCJ2ZXIiOiJ2MiIsInR0eXAiOiJzdGF0aWMifQ.eyJpc3MiOiJhZG1pbiBmcm9tIE5DRUwxNDExOTIiLCJzdWIiOiJhZG1pbiIsImF1ZCI6ImtlcHRuIiwiaWRwIjoiU3BsdW5rIiwianRpIjoiODBkOGFkNDQ4MWY3NWQwOTYzMjY3ZWM3NjAzNjQ1NDg4NDI0ZWE1YTkyZDk0NTYzNGRkNTk1NzU1YTk3YzEyZCIsImlhdCI6MTY4NTYwNTM2MywiZXhwIjoxNjg4MTk3MzYzLCJuYnIiOjE2ODU2MDUzNjN9.eLqkWeU6TQzmfMwoJY3E0USL36pxzUri7mst-HrQb2Ay3UgZpCBfUdEM6BZ-Qgfm1gLxvGWKBsqDPGezBeiuhg",
 	}
 
 	metric, err := job.GetMetricFromNewJob(&client, &spReq)
