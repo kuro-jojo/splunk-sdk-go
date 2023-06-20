@@ -22,7 +22,7 @@ If you haven't already installed Splunk Enterprise, download it [here](http://ww
 
 Use the following command to install the Splunk SDK for Go
 
-`go get -u github.com/kuro-jojo/splunk-sdk-go`
+    go get -u github.com/kuro-jojo/splunk-sdk-go
 
 ### Example [![Go Reference](https://pkg.go.dev/badge/github.com/kuro-jojo/splunk-sdk-go.svg)](https://pkg.go.dev/github.com/kuro-jojo/splunk-sdk-go)
 
@@ -32,8 +32,8 @@ You'll need at first a Splunk enterprise instance running. If you don't have one
 * For that you'll need *docker* to be installed
 * Then run a local Splunk enterprise instance (check it on [docker](https://hub.docker.com/r/splunk/splunk)) : 
 
-    ```docker run -d -p 8000:8000 -e "SPLUNK_START_ARGS=--accept-license" \
-      -e "SPLUNK_PASSWORD=<password>" --name splunk splunk/splunk:latest```
+         docker run -d -p 8000:8000 -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=<password>" --name splunk splunk/splunk:latest
+
 
     After the container starts up successfully and enters the "healthy" state, you should be able to access SplunkWeb at http://localhost:8000 with admin:\<password>.
 
