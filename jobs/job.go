@@ -9,34 +9,21 @@ import (
 
 	splunk "github.com/kuro-jojo/splunk-sdk-go/client"
 )
+const resutltUri = "results"
 
 // Return a metric from a new created job
 func GetMetricFromNewJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (float64, error) {
 
-	const RESULTS_URI = "results"
+	// create the endpoint for the request
+	CreateJobEndpoint(client)
 
-	endpoint, err := CreateJobEndpoint(client)
-	if err != nil {
-		return -1, fmt.Errorf("error while creating the endpoint : %s", err)
-	}
-
-	client.Endpoint = endpoint
 	spRequest.Params.SearchQuery = ValidateSearchQuery(spRequest.Params.SearchQuery)
 	sid, err := CreateJob(client, spRequest)
 	if err != nil {
 		return -1, fmt.Errorf("error while creating the job : %s", err)
 	}
 
-	newEndpoint := endpoint + sid
-	// check if the endpoint is correctly formed
-	if !strings.HasSuffix(newEndpoint, "/") {
-		newEndpoint += "/"
-	}
-
-	// the endpoint where to find the corresponding job
-	client.Endpoint = newEndpoint + RESULTS_URI
-
-	res, err := RetrieveJobResult(client, spRequest)
+	res, err := RetrieveJobResult(client, sid)
 
 	if err != nil {
 		return -1, fmt.Errorf("error while handling the results. Error message : %s", err)
@@ -92,9 +79,20 @@ func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (st
 }
 
 // return the result of a job get by its SID
-func RetrieveJobResult(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) ([]map[string]string, error) {
+func RetrieveJobResult(client *splunk.SplunkClient, sid string) ([]map[string]string, error) {
+
+	newEndpoint := client.Endpoint + sid
+	fmt.Printf("new endpoint : %s\n", newEndpoint)
+	// check if the endpoint is correctly formed
+	if !strings.HasSuffix(newEndpoint, "/") {
+		newEndpoint += "/"
+	}
+
+	// the endpoint where to find the corresponding job
+	client.Endpoint = newEndpoint + resutltUri
+
 	// make the get request
-	getResp, err := GetJob(client, spRequest)
+	getResp, err := GetJob(client)
 	if err != nil {
 		return nil, fmt.Errorf("error while making the get request : %s", err)
 	}

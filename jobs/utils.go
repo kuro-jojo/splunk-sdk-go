@@ -47,7 +47,7 @@ func HttpJobRequest(client *splunk.SplunkClient, method string, spRequest *splun
 	return splunk.MakeHttpRequest(client, method, spRequest, params)
 }
 
-func CreateJobEndpoint(client *splunk.SplunkClient) (string, error) {
+func CreateJobEndpoint(client *splunk.SplunkClient) {
 	host := client.Host
 	port := client.Port
 
@@ -56,7 +56,7 @@ func CreateJobEndpoint(client *splunk.SplunkClient) (string, error) {
 	} else if strings.HasPrefix(host, "http://") {
 		host = strings.Replace(host, "http://", "", 1)
 	}
-	return "https://" + net.JoinHostPort(host, port) + "/" + PATH_JOBS_V2, nil
+	client.Endpoint = "https://" + net.JoinHostPort(host, port) + "/" + PATH_JOBS_V2
 }
 
 func PostJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (*http.Response, error) {
@@ -64,12 +64,16 @@ func PostJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (*htt
 	return HttpSearchRequest(client, "POST", spRequest)
 }
 
-func GetJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (*http.Response, error) {
+func GetJob(client *splunk.SplunkClient) (*http.Response, error) {
 
-	return HttpSearchRequest(client, "GET", spRequest)
+	return HttpSearchRequest(client, "GET", nil)
 }
 
 func HttpSearchRequest(client *splunk.SplunkClient, method string, spRequest *splunk.SplunkRequest) (*http.Response, error) {
+
+	if spRequest == nil {
+		spRequest = &splunk.SplunkRequest{}
+	}
 
 	spRequest.Params.OutputMode = "json"
 	spRequest.Params.ExecMode = "blocking"

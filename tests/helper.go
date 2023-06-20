@@ -3,9 +3,10 @@ package tests
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 )
 
-// mock an http server 
+// mock an http server
 func MockRequest(response string, verify bool) *httptest.Server {
 	server := &httptest.Server{}
 	if verify {
@@ -55,4 +56,16 @@ func writeResponses(responses interface{}, w *http.ResponseWriter, r *http.Reque
 	case string:
 		_, _ = (*w).Write([]byte(responses.(string)))
 	}
+}
+
+func GetServerHostname(server *httptest.Server) string {
+	host := strings.Split(strings.Split(server.URL, ":")[1], "//")[1]
+
+	return host
+}
+
+func GetServerPort(server *httptest.Server) string {
+	port := strings.Split(server.URL, ":")[2]
+
+	return port
 }
