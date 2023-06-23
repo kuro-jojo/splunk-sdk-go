@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 // create an authentication key depending on the method provided
@@ -40,7 +43,7 @@ func CreateAuthenticationKey(client *SplunkClient) (string, error) {
 	} else if client.Username != "" && client.Password != "" {
 		return base64.StdEncoding.EncodeToString([]byte(client.Username + ":" + client.Password)), nil
 	}
-	
+
 	return "", fmt.Errorf("no authentication method provided")
 }
 
@@ -76,7 +79,8 @@ func MakeHttpRequest(client *SplunkClient, method string, spRequest *SplunkReque
 		return nil, err
 	}
 	spRequest.Headers["Authorization"] = token
-
+	logger.Infof("Authorization token: %s", token)
+	logger.Infof("Authorization : %s", spRequest.Headers["Authorization"])
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
@@ -89,4 +93,15 @@ func MakeHttpRequest(client *SplunkClient, method string, spRequest *SplunkReque
 	}
 
 	return resp, nil
+}
+
+func configureLogger(eventID, keptnContext string) {
+	if os.Getenv("LOG_LEVEL") != "" {
+		logLevel, err := logger.ParseLevel(os.Getenv("LOG_LEVEL"))
+		if err != nil {
+			logger.WithError(err).Error("could not parse log level provided by 'LOG_LEVEL' env var")
+		} else {
+			logger.SetLevel(logLevel)
+		}
+	}
 }
