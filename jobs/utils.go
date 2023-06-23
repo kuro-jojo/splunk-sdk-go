@@ -57,6 +57,7 @@ func CreateJobEndpoint(client *splunk.SplunkClient) {
 		host = strings.Replace(host, "http://", "", 1)
 	}
 	client.Endpoint = "https://" + net.JoinHostPort(host, port) + "/" + PATH_JOBS_V2
+	client.Endpoint = strings.ReplaceAll(client.Endpoint, " ", "")
 }
 
 func PostJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (*http.Response, error) {
