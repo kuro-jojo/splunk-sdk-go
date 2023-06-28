@@ -46,21 +46,6 @@ func GetMetricFromNewJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRe
 	return metric, nil
 }
 
-// Create a new alert from saved search
-func CreateNewAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (error) {
-
-	// create the endpoint for the request
-	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES)
-
-	spAlert.Params.SearchQuery = ValidateSearchQuery(spAlert.Params.SearchQuery)
-	err := CreateAlert(client, spAlert, PATH_SAVED_SEARCHES)
-	if err != nil {
-		return fmt.Errorf("error while creating the alert : %s", err)
-	}
-	return err
-
-}
-
 // this function create a new job and return its SID
 func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest, service string) (string, error) {
 
@@ -97,13 +82,17 @@ func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest, ser
 	return sid, nil
 }
 
-// this function create a new alert
+// Creates a new alert from saved search
 func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert, service string) (error) {
+
+	// create the endpoint for the request
+	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES)
+	spAlert.Params.SearchQuery = ValidateSearchQuery(spAlert.Params.SearchQuery)
 
 	resp, err := PostAlert(client, spAlert)
 
 	if err != nil {
-		return fmt.Errorf("error while making the post request : %s", err)
+		return fmt.Errorf("Alert creation : error while making the post request : %s", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -111,14 +100,14 @@ func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert, servi
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := splunk.HandleHttpError(body)
 		if err == nil {
-			return fmt.Errorf("http error :  %s", status)
+			return fmt.Errorf("Alert creation : http error :  %s", status)
 		} else {
-			return fmt.Errorf("http error :  %s", resp.Status)
+			return fmt.Errorf("Alert creation : http error :  %s", resp.Status)
 		}
 	}
 
 	if err != nil {
-		return fmt.Errorf("error while getting the body of the post request : %s", err)
+		return fmt.Errorf("Alert creation : error while getting the body of the post request : %s", err)
 	}
 
 	return nil
