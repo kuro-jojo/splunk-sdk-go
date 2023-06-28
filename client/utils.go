@@ -59,7 +59,7 @@ func HandleHttpError(body []byte) (string, error) {
 	return "", fmt.Errorf("incorrect format")
 }
 
-func MakeHttpRequest(client *SplunkClient, method string, spRequest *SplunkRequest, params url.Values) (*http.Response, error) {
+func MakeHttpRequest(client *SplunkClient, method string, spRequest req, params url.Values) (*http.Response, error) {
 
 	// create a new request
 	req, err := http.NewRequest(method, client.Endpoint, strings.NewReader(params.Encode()))
@@ -67,17 +67,17 @@ func MakeHttpRequest(client *SplunkClient, method string, spRequest *SplunkReque
 		return nil, err
 	}
 	// add the headers
-	if spRequest.Headers == nil {
-		spRequest.Headers = map[string]string{}
+	if spRequest.getHeaders() == nil {
+		spRequest.setHeaders(map[string]string{})
 	}
 
 	token, err := CreateAuthenticationKey(client)
 	if err != nil {
 		return nil, err
 	}
-	spRequest.Headers["Authorization"] = token
+	spRequest.setHeaders(map[string]string{"Authorization":token})
 
-	for header, val := range spRequest.Headers {
+	for header, val := range spRequest.getHeaders() {
 		req.Header.Add(header, val)
 	}
 

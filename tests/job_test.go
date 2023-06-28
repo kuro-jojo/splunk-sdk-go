@@ -81,9 +81,9 @@ func TestCreateJob(t *testing.T) {
 		true,
 	)
 
-	job.CreateJobEndpoint(client)
+	job.CreateServiceEndpoint(client, PATH_JOBS_V2)
 
-	sid, err := job.CreateJob(client, &spReq)
+	sid, err := job.CreateJob(client, &spReq,PATH_JOBS_V2)
 
 	if err != nil {
 		t.Fatalf("Got an error : %s", err)
@@ -112,7 +112,7 @@ func TestRetrieveJobResult(t *testing.T) {
 		"token",
 		true,
 	)
-	job.CreateJobEndpoint(client)
+	job.CreateServiceEndpoint(client, PATH_JOBS_V2)
 	results, err := job.RetrieveJobResult(client, "10")
 
 	if err != nil {

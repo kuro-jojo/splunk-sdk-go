@@ -5,9 +5,19 @@ import (
 	"net/http"
 )
 
+type req interface {
+	getHeaders() map[string]string
+	setHeaders(map[string]string)
+}
+
 type SplunkRequest struct {
 	Headers map[string]string
 	Params  RequestParams
+}
+
+type SplunkAlert struct {
+	Headers map[string]string
+	Params  AlertParams
 }
 
 type RequestParams struct {
@@ -22,6 +32,21 @@ type RequestParams struct {
 	LatestTime string
 }
 
+type AlertParams struct {
+	Name string
+	Description string `default:""`
+	CronSchedule string
+	// splunk search in spl syntax
+	SearchQuery string 
+	OutputMode  string `default:"json"`
+	// splunk returns a job SID only if the job is complete
+	EarliestTime string
+	// latest (exclusive) time bounds for the search
+	LatestTime string
+	//condition for triggering the alert
+	AlertCondition string
+}
+
 type SplunkClient struct {
 	Client     *http.Client
 	Host       string
@@ -33,6 +58,22 @@ type SplunkClient struct {
 	SessionKey string
 	// if true, ssl verification is skipped
 	SkipSSL bool
+}
+
+func (sR SplunkRequest) getHeaders()  map[string]string{
+	return sR.Headers
+}
+
+func (sA SplunkAlert) getHeaders()  map[string]string{
+	return sA.Headers
+}
+
+func (sR SplunkRequest) setHeaders(headers map[string]string){
+	sR.Headers = headers
+}
+
+func (sA SplunkAlert) setHeaders(headers map[string]string){
+	sA.Headers = headers
 }
 
 // create a new Client

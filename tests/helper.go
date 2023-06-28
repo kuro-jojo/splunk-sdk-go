@@ -6,6 +6,9 @@ import (
 	"strings"
 )
 
+const PATH_JOBS_V2 = "services/search/v2/jobs/"
+const PATH_SAVED_SEARCHES = "services/saved/searches/"
+
 // mock an http server
 func MockRequest(response string, verify bool) *httptest.Server {
 	server := &httptest.Server{}

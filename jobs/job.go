@@ -9,16 +9,17 @@ import (
 
 	splunk "github.com/kuro-jojo/splunk-sdk-go/client"
 )
+
 const resutltUri = "results"
 
 // Return a metric from a new created job
 func GetMetricFromNewJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (float64, error) {
 
 	// create the endpoint for the request
-	CreateJobEndpoint(client)
+	CreateServiceEndpoint(client, PATH_JOBS_V2)
 
 	spRequest.Params.SearchQuery = ValidateSearchQuery(spRequest.Params.SearchQuery)
-	sid, err := CreateJob(client, spRequest)
+	sid, err := CreateJob(client, spRequest, PATH_JOBS_V2)
 	if err != nil {
 		return -1, fmt.Errorf("error while creating the job : %s", err)
 	}
@@ -45,8 +46,23 @@ func GetMetricFromNewJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRe
 	return metric, nil
 }
 
+// Create a new alert from saved search
+func CreateNewAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (error) {
+
+	// create the endpoint for the request
+	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES)
+
+	spAlert.Params.SearchQuery = ValidateSearchQuery(spAlert.Params.SearchQuery)
+	err := CreateAlert(client, spAlert, PATH_SAVED_SEARCHES)
+	if err != nil {
+		return fmt.Errorf("error while creating the alert : %s", err)
+	}
+	return err
+
+}
+
 // this function create a new job and return its SID
-func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (string, error) {
+func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest, service string) (string, error) {
 
 	resp, err := PostJob(client, spRequest)
 
@@ -70,12 +86,42 @@ func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest) (st
 	}
 
 	// create the new endpoint for the post request
-	sid, err := getSID(body)
-	if err != nil {
-		return "", fmt.Errorf("error : %s", err)
+	var sid string
+	if service==PATH_JOBS_V2{
+		sid, err = getSID(body)
+		if err != nil {
+			return "", fmt.Errorf("error : %s", err)
+		}
 	}
 
 	return sid, nil
+}
+
+// this function create a new alert
+func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert, service string) (error) {
+
+	resp, err := PostAlert(client, spAlert)
+
+	if err != nil {
+		return fmt.Errorf("error while making the post request : %s", err)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	// handle error
+	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
+		status, err := splunk.HandleHttpError(body)
+		if err == nil {
+			return fmt.Errorf("http error :  %s", status)
+		} else {
+			return fmt.Errorf("http error :  %s", resp.Status)
+		}
+	}
+
+	if err != nil {
+		return fmt.Errorf("error while getting the body of the post request : %s", err)
+	}
+
+	return nil
 }
 
 // return the result of a job get by its SID
