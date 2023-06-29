@@ -83,7 +83,7 @@ func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest, ser
 }
 
 // Creates a new alert from saved search
-func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert, service string) (error) {
+func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (error) {
 
 	// create the endpoint for the request
 	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES)
