@@ -45,6 +45,8 @@ type AlertParams struct {
 	LatestTime string
 	//condition for triggering the alert
 	AlertCondition string
+	Actions string
+	WebhookUrl string
 }
 
 type SplunkClient struct {
