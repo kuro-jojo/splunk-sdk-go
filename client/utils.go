@@ -79,11 +79,9 @@ func MakeHttpRequest(client *SplunkClient, method string, spRequest *SplunkReque
 	}
 	spRequest.Headers= map[string]string{"Authorization":token}
 
-	log.Printf( "Before : %v", req.Header)
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
-	log.Printf( "After : %v", req.Header)
 	// get the response
 	resp, err := client.Client.Do(req)
 
@@ -115,13 +113,8 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
-	body, _ := io.ReadAll(req.Body)
-	log.Printf( "After : %v Sep %v", req.Body, string(body))
 	// get the response
 	resp, err := client.Client.Do(req)
-
-	body, _ = io.ReadAll(req.Body)
-	log.Printf( "After resp : %v, Err : %v", string(body), err.Error())
 
 	if err != nil {
 		return nil, err
