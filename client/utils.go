@@ -111,11 +111,11 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	}
 	spRequest.Headers= map[string]string{"Authorization":token}
 
-	log.Printf( "Before : %v", req.Header)
+	log.Printf( "Before : %v", req)
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
-	log.Printf( "After : %v", req.Header)
+	log.Printf( "After : %v", req)
 	// get the response
 	resp, err := client.Client.Do(req)
 
