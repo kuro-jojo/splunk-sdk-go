@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"strings"
 
-	"google.golang.org/appengine/log"
 )
 
 // create an authentication key depending on the method provided
@@ -79,11 +78,11 @@ func MakeHttpRequest(client *SplunkClient, method string, spRequest req, params 
 	}
 	spRequest.setHeaders(map[string]string{"Authorization":token})
 
-	log.Errorf("BEFORE : %v", req.Header)
+	return nil, fmt.Errorf("before : %v", req.Header)
 	for header, val := range spRequest.getHeaders() {
 		req.Header.Add(header, val)
 	}
-	log.Errorf("AFTER : %v", req.Header)
+	
 	// get the response
 	resp, err := client.Client.Do(req)
 
