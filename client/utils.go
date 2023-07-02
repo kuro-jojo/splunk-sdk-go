@@ -114,9 +114,9 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
-	log.Printf( "After : %v", req.Body)
+	log.Printf( "After : %v Sep %v", req.Body, &req.Body)
 	// get the response
-	resp, err := client.Client.Do(req.b)
+	resp, err := client.Client.Do(req)
 
 	if err != nil {
 		return nil, err
