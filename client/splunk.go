@@ -5,11 +5,6 @@ import (
 	"net/http"
 )
 
-type req interface {
-	getHeaders() map[string]string
-	setHeaders(map[string]string)
-}
-
 type SplunkRequest struct {
 	Headers map[string]string
 	Params  RequestParams
@@ -60,22 +55,6 @@ type SplunkClient struct {
 	SessionKey string
 	// if true, ssl verification is skipped
 	SkipSSL bool
-}
-
-func (sR SplunkRequest) getHeaders()  map[string]string{
-	return sR.Headers
-}
-
-func (sA SplunkAlert) getHeaders()  map[string]string{
-	return sA.Headers
-}
-
-func (sR SplunkRequest) setHeaders(headers map[string]string){
-	sR.Headers = headers
-}
-
-func (sA SplunkAlert) setHeaders(headers map[string]string){
-	sA.Headers = headers
 }
 
 // create a new Client

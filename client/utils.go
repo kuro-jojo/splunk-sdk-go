@@ -60,7 +60,7 @@ func HandleHttpError(body []byte) (string, error) {
 	return "", fmt.Errorf("incorrect format")
 }
 
-func MakeHttpRequest(client *SplunkClient, method string, spRequest req, params url.Values) (*http.Response, error) {
+func MakeHttpRequest(client *SplunkClient, method string, spRequest *SplunkRequest, params url.Values) (*http.Response, error) {
 
 	// create a new request
 	req, err := http.NewRequest(method, client.Endpoint, strings.NewReader(params.Encode()))
@@ -68,18 +68,51 @@ func MakeHttpRequest(client *SplunkClient, method string, spRequest req, params 
 		return nil, err
 	}
 	// add the headers
-	if spRequest.getHeaders() == nil {
-		spRequest.setHeaders(map[string]string{})
+	if spRequest.Headers == nil {
+		spRequest.Headers= map[string]string{}
 	}
 
 	token, err := CreateAuthenticationKey(client)
 	if err != nil {
 		return nil, err
 	}
-	spRequest.setHeaders(map[string]string{"Authorization":token})
+	spRequest.Headers= map[string]string{"Authorization":token}
 
 	log.Printf( "Before : %v", req.Header)
-	for header, val := range spRequest.getHeaders() {
+	for header, val := range spRequest.Headers {
+		req.Header.Add(header, val)
+	}
+	log.Printf( "After : %v", req.Header)
+	// get the response
+	resp, err := client.Client.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *SplunkAlert, params url.Values) (*http.Response, error) {
+
+	// create a new request
+	req, err := http.NewRequest(method, client.Endpoint, strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	// add the headers
+	if spRequest.Headers == nil {
+		spRequest.Headers= map[string]string{}
+	}
+
+	token, err := CreateAuthenticationKey(client)
+	if err != nil {
+		return nil, err
+	}
+	spRequest.Headers= map[string]string{"Authorization":token}
+
+	log.Printf( "Before : %v", req.Header)
+	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
 	log.Printf( "After : %v", req.Header)

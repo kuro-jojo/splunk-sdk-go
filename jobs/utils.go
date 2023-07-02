@@ -135,5 +135,5 @@ func HttpAlertRequest(client *splunk.SplunkClient, method string, spAlert *splun
 		}
 	}
 
-	return splunk.MakeHttpRequest(client, method, spAlert, params)
+	return splunk.MakeAlertHttpRequest(client, method, spAlert, params)
 }
