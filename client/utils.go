@@ -120,6 +120,9 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	// get the response
 	resp, err := client.Client.Do(req)
 
+	body, _ = io.ReadAll(req.Body)
+	log.Printf( "After resp : %v, Err : %v", string(body), err.Error())
+
 	if err != nil {
 		return nil, err
 	}
