@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -114,7 +115,8 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
-	log.Printf( "After : %v Sep %v", req.Body, &req.Body)
+	body, _ := io.ReadAll(req.Body)
+	log.Printf( "After : %v Sep %v", req.Body, body)
 	// get the response
 	resp, err := client.Client.Do(req)
 
