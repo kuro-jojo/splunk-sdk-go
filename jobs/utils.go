@@ -117,21 +117,18 @@ func HttpAlertRequest(client *splunk.SplunkClient, method string, spAlert *splun
 
 	if method == "POST" {
 		params.Add("name", spAlert.Params.Name)
+		params.Add("actions", spAlert.Params.Actions)
+		params.Add("action.webhook.param.url", spAlert.Params.WebhookUrl)
 		params.Add("search", spAlert.Params.SearchQuery)
 		params.Add("cron_schedule", spAlert.Params.CronSchedule)
 		params.Add("alert_condition", spAlert.Params.AlertCondition)
-		params.Add("actions", spAlert.Params.Actions)
-		params.Add("action.webhook.param.url", spAlert.Params.WebhookUrl)
+		params.Add("is_scheduled", "1")
+		params.Add("dispatch.earliest_time", spAlert.Params.EarliestTime)
+		params.Add("dispatch.latest_time", spAlert.Params.LatestTime)
+		params.Add("alert_type", "custom")
 
-		
-		if spAlert.Params.EarliestTime != "" {
+		if spAlert.Params.Description != "" {
 			params.Add("description", spAlert.Params.Description)
-		}
-		if spAlert.Params.EarliestTime != "" {
-			params.Add("earliest_time", spAlert.Params.EarliestTime)
-		}
-		if spAlert.Params.LatestTime != "" {
-			params.Add("latest_time", spAlert.Params.LatestTime)
 		}
 	}
 
