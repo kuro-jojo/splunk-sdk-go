@@ -78,17 +78,17 @@ func MakeHttpRequest(client *SplunkClient, method string, spRequest req, params 
 	}
 	spRequest.setHeaders(map[string]string{"Authorization":token})
 
-	return nil, fmt.Errorf("before : %v", req.Header)
-	for header, val := range spRequest.getHeaders() {
-		req.Header.Add(header, val)
-	}
+	return nil, fmt.Errorf("BEFORE : %v", req.Header)
+	// for header, val := range spRequest.getHeaders() {
+	// 	req.Header.Add(header, val)
+	// }
 	
 	// get the response
-	resp, err := client.Client.Do(req)
+	// resp, err := client.Client.Do(req)
 
-	if err != nil {
-		return nil, err
-	}
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return resp, nil
+	// return resp, nil
 }
