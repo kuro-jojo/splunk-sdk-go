@@ -127,7 +127,7 @@ func HttpAlertRequest(client *splunk.SplunkClient, method string, spAlert *splun
 			params.Add("action.webhook.param.url", spAlert.Params.WebhookUrl)
 		}
 		if spAlert.Params.SearchQuery != "" {
-			params.Add("search", spAlert.Params.SearchQuery)
+			params.Add("search", "")
 		}
 		if spAlert.Params.CronSchedule != "" {
 			params.Add("cron_schedule", spAlert.Params.CronSchedule)
