@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -94,6 +95,7 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 
 	// create a new request
 	req, err := http.NewRequest(method, client.Endpoint, strings.NewReader(params.Encode()))
+	
 	if err != nil {
 		return nil, err
 	}
@@ -111,6 +113,7 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
+	fmt.Printf("--> %s\n\n", formatRequest(req))
 	// get the response
 	resp, err := client.Client.Do(req)
 
@@ -120,3 +123,30 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 
 	return resp, nil
 }
+
+// formatRequest generates ascii representation of a request
+func formatRequest(r *http.Request) string {
+	// Create return string
+	var request []string
+	// Add the request string
+	url := fmt.Sprintf("%v %v %v", r.Method, r.URL, r.Proto)
+	request = append(request, url)
+	// Add the host
+	request = append(request, fmt.Sprintf("Host: %v", r.Host))
+	// Loop through headers
+	for name, headers := range r.Header {
+	  name = strings.ToLower(name)
+	  for _, h := range headers {
+		request = append(request, fmt.Sprintf("%v: %v", name, h))
+	  }
+	}
+	
+	// If this is a POST, add post data
+	if r.Method == "POST" {
+	   r.ParseForm()
+	   request = append(request, "\n")
+	   request = append(request, r.Form.Encode())
+	} 
+	 // Return the request as a string
+	 return strings.Join(request, "\n")
+   }
