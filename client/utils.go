@@ -115,13 +115,13 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 		req.Header.Add(header, val)
 	}
 	body, _:= io.ReadAll(req.Body)
-	fmt.Printf("The body of the request : %v", string(body))
+	return nil, fmt.Errorf("The body of the request : %v", string(body))
 	// get the response
-	resp, err := client.Client.Do(req)
+	// resp, err := client.Client.Do(req)
 
-	if err != nil {
-		return nil, err
-	}
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return resp, nil
+	// return resp, nil
 }
