@@ -115,7 +115,7 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	if err != nil {
 		return nil, err
 	}
-	spRequest.Headers= map[string]string{"Authorization":token}
+	spRequest.Headers= map[string]string{"Authorization":token, "Content-Type":"application/x-www-form-urlencoded"}
 
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
