@@ -118,37 +118,37 @@ func HttpAlertRequest(client *splunk.SplunkClient, method string, spAlert *splun
 	if method == "POST" {
 		
 		if spAlert.Params.Name != "" {
-			params.Add("name", spAlert.Params.Name)
+			params.Add("name", "")
 		}
 		if spAlert.Params.Actions != "" {
-			params.Add("actions", spAlert.Params.Actions)
+			params.Add("actions", "")
 		}
 		if spAlert.Params.WebhookUrl != "" {
-			params.Add("action.webhook.param.url", spAlert.Params.WebhookUrl)
+			params.Add("action.webhook.param.url", "")
 		}
 		if spAlert.Params.SearchQuery != "" {
 			params.Add("search", "")
 		}
 		if spAlert.Params.CronSchedule != "" {
-			params.Add("cron_schedule", spAlert.Params.CronSchedule)
+			params.Add("cron_schedule", "")
 		}
 		if spAlert.Params.AlertCondition != "" {
-			params.Add("alert_condition", spAlert.Params.AlertCondition)
+			params.Add("alert_condition", "")
 		}
 
-		params.Add("is_scheduled", "1")
+		params.Add("is_scheduled", "")
 
 		if spAlert.Params.EarliestTime != "" {
-			params.Add("dispatch.earliest_time", spAlert.Params.EarliestTime)
+			params.Add("dispatch.earliest_time", "")
 		}
 		if spAlert.Params.LatestTime != "" {
-			params.Add("dispatch.latest_time", spAlert.Params.LatestTime)
+			params.Add("dispatch.latest_time", "")
 		}
 
-		params.Add("alert_type", "custom")
+		params.Add("alert_type", "")
 
 		if spAlert.Params.Description != "" {
-			params.Add("description", spAlert.Params.Description)
+			params.Add("description", "")
 		}
 		
 	}
