@@ -123,6 +123,12 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	// get the response
 	resp, err := client.Client.Do(req)
 
+	respDump, err2 := httputil.DumpResponse(resp, true)
+	if err2 != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Printing resp : "+string(respDump))
+
 	if err != nil {
 		return nil, err
 	}
