@@ -96,12 +96,6 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	// create a new request
 	req, err := http.NewRequest(method, client.Endpoint, strings.NewReader(params.Encode()))
 
-	requestDump, err2 := httputil.DumpRequest(req, true)
-	if err2 != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Printing req : "+string(requestDump))
-	
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +113,13 @@ func MakeAlertHttpRequest(client *SplunkClient, method string, spRequest *Splunk
 	for header, val := range spRequest.Headers {
 		req.Header.Add(header, val)
 	}
+
+	requestDump, err2 := httputil.DumpRequest(req, true)
+	if err2 != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Printing req : "+string(requestDump))
+
 	// get the response
 	resp, err := client.Client.Do(req)
 
