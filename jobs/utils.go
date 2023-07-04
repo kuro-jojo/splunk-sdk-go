@@ -150,6 +150,8 @@ func HttpAlertRequest(client *splunk.SplunkClient, method string, spAlert *splun
 		if spAlert.Params.Description != "" {
 			params.Add("description", spAlert.Params.Description)
 		}
+
+		params.Add("alert.track", "1")
 		
 	}
 
