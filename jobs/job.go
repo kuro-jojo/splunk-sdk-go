@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http/httputil"
 	"strconv"
 	"strings"
 
@@ -91,6 +92,15 @@ func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (erro
 
 	resp, err := PostAlert(client, spAlert)
 
+	var respDump []byte
+	var errDump error 
+	if(resp!=nil){
+		respDump, errDump = httputil.DumpResponse(resp, true)
+		if errDump != nil {
+			fmt.Println(errDump)
+		}
+	}
+
 	if err != nil {
 		return fmt.Errorf("Alert creation : error while making the post request : %s", err)
 	}
@@ -100,9 +110,9 @@ func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (erro
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := splunk.HandleHttpError(body)
 		if err == nil {
-			return fmt.Errorf("Alert creation : http error :  %s", status)
+			return fmt.Errorf("Alert creation : http error :  %s \nResponse : %v", status, string(respDump))
 		} else {
-			return fmt.Errorf("Alert creation : http error :  %s", resp.Status)
+			return fmt.Errorf("Alert creation : http error :  %s \nResponse : %v", resp.Status, string(respDump))
 		}
 	}
 
