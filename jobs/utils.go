@@ -17,7 +17,7 @@ type splunkAlertEntry struct {
 }
 
 type splunkAlertList struct {
-	Item splunkAlertEntry  `json:"entry"`
+	Item []splunkAlertEntry  `json:"entry"`
 }
 
 func ValidateSearchQuery(searchQuery string) string {
