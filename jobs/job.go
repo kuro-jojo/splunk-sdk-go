@@ -124,12 +124,15 @@ func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (erro
 }
 
 // Removes an existing saved search
-func RemoveAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (error) {
+func RemoveAlert(client *splunk.SplunkClient, alertName string) (error) {
 
 	// create the endpoint for the request
-	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES+spAlert.Params.Name)
+	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES+alertName)
 
-	resp, err := DeleteAlert(client, spAlert)
+	splunkAlert := splunk.SplunkAlert{}
+	splunkAlert.Params.Name = alertName
+
+	resp, err := DeleteAlert(client, &splunkAlert)
 
 	var respDump []byte
 	var errDump error 
