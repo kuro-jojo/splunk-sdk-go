@@ -123,6 +123,91 @@ func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (erro
 	return nil
 }
 
+// Removes an existing saved search
+func RemoveAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (error) {
+
+	// create the endpoint for the request
+	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES+spAlert.Params.Name)
+
+	resp, err := DeleteAlert(client, spAlert)
+
+	var respDump []byte
+	var errDump error 
+	if(resp!=nil){
+		respDump, errDump = httputil.DumpResponse(resp, true)
+		if errDump != nil {
+			fmt.Println(errDump)
+		}
+	}
+
+	if err != nil {
+		return fmt.Errorf("Alert Removing : error while making the delete request : %s", err)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	// handle error
+	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
+		status, err := splunk.HandleHttpError(body)
+		if err == nil {
+			return fmt.Errorf("Alert Removing : http error :  %s \nResponse : %v", status, string(respDump))
+		} else {
+			return fmt.Errorf("Alert Removing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
+		}
+	}
+
+	if err != nil {
+		return fmt.Errorf("Alert Removing : error while getting the body of the delete request : %s", err)
+	}
+
+	return nil
+}
+
+// List saved searches
+func ListAlertsNames(client *splunk.SplunkClient) (splunkAlertList, error) {
+
+	var alertList splunkAlertList
+	
+	// create the endpoint for the request
+	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES)
+
+	resp, err := GetAlerts(client)
+
+	var respDump []byte
+	var errDump error 
+	if(resp!=nil){
+		respDump, errDump = httputil.DumpResponse(resp, true)
+		if errDump != nil {
+			fmt.Println(errDump)
+		}
+	}
+
+	if err != nil {
+		return alertList, fmt.Errorf("Alerts' names listing : error while making the get request : %s", err)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	// handle error
+	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
+		status, err := splunk.HandleHttpError(body)
+		if err == nil {
+			return alertList, fmt.Errorf("Alerts' names listing : http error :  %s \nResponse : %v", status, string(respDump))
+		} else {
+			return alertList, fmt.Errorf("Alerts' names listing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
+		}
+	}
+
+	if err != nil {
+		return alertList, fmt.Errorf("Alerts' names listing : error while getting the body of the get request : %s", err)
+	}
+
+	err = json.Unmarshal(body, &alertList)
+	if err != nil {
+		return alertList, fmt.Errorf("Could not map list of alerts to datastructure: %s", err.Error())
+	}
+
+	return alertList, nil
+}
+
 // return the result of a job get by its SID
 func RetrieveJobResult(client *splunk.SplunkClient, sid string) ([]map[string]string, error) {
 

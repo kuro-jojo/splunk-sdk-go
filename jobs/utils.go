@@ -12,6 +12,14 @@ import (
 const PATH_JOBS_V2 = "services/search/v2/jobs/"
 const PATH_SAVED_SEARCHES = "services/saved/searches/"
 
+type splunkAlertEntry struct {
+	Name string  `json:"name"`
+}
+
+type splunkAlertList struct {
+	Item splunkAlertEntry  `json:"entry"`
+}
+
 func ValidateSearchQuery(searchQuery string) string {
 	// the search must start with the "search" keyword
 	const QUERY_PREFIX = "search "
@@ -74,6 +82,16 @@ func PostAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (*http.
 func GetJob(client *splunk.SplunkClient) (*http.Response, error) {
 
 	return HttpSearchRequest(client, "GET", nil)
+}
+
+func GetAlerts(client *splunk.SplunkClient) (*http.Response, error) {
+
+	return HttpAlertRequest(client, "GET", nil)
+}
+
+func DeleteAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (*http.Response, error) {
+
+	return HttpAlertRequest(client, "DELETE", spAlert)
 }
 
 func HttpSearchRequest(client *splunk.SplunkClient, method string, spRequest *splunk.SplunkRequest) (*http.Response, error) {
