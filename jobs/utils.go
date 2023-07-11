@@ -11,6 +11,7 @@ import (
 
 const PATH_JOBS_V2 = "services/search/v2/jobs/"
 const PATH_SAVED_SEARCHES = "services/saved/searches/"
+const PATH_TRIGGERED_ALERTS = "services/alerts/fired_alerts/"
 
 type splunkAlertEntry struct {
 	Name string  `json:"name"`
@@ -18,6 +19,38 @@ type splunkAlertEntry struct {
 
 type splunkAlertList struct {
 	Item []splunkAlertEntry  `json:"entry"`
+}
+
+type TriggeredAlerts struct {
+	Origin string `json:"origin"`
+	Updated string `json:"updated"`
+	Entry []EntryItem `json:"entry"`
+}
+
+type TriggeredInstances struct {
+	Origin string `json:"origin"`
+	Updated string `json:"updated"`
+	Entry []EntryItem `json:"entry"`
+}	
+
+type EntryItem struct {
+	Name string `json:"name"`
+	Links Links `json:"links"`
+	Content string `content:"content"`
+}
+
+type Links struct {
+	Alternate string `json:"alternate"`
+	List string `json:"list"`
+	Remove string `json:"remove"`
+	Job string `json:"job"`
+	SavedSearch string `json:"savedsearch"`
+}
+
+type Content struct {
+	SavedSearchName string `json:"savedsearch_name"`
+	TriggerTime int `json:"trigger_time"`
+	TriggeredAlertCount int `json:"triggered_alert_count"`
 }
 
 func ValidateSearchQuery(searchQuery string) string {

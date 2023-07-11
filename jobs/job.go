@@ -254,6 +254,96 @@ func RetrieveJobResult(client *splunk.SplunkClient, sid string) ([]map[string]st
 	return results.Results, nil
 }
 
+func GetTriggeredAlerts(client *splunk.SplunkClient) (TriggeredAlerts, error) {
+
+	var triggeredAlerts TriggeredAlerts
+	
+	// create the endpoint for the request
+	CreateServiceEndpoint(client, PATH_TRIGGERED_ALERTS)
+
+	resp, err := GetAlerts(client)
+
+	var respDump []byte
+	var errDump error 
+	if(resp!=nil){
+		respDump, errDump = httputil.DumpResponse(resp, true)
+		if errDump != nil {
+			fmt.Println(errDump)
+		}
+	}
+
+	if err != nil {
+		return triggeredAlerts, fmt.Errorf("Triggered alerts' names listing : error while making the get request : %s", err)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	// handle error
+	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
+		status, err := splunk.HandleHttpError(body)
+		if err == nil {
+			return triggeredAlerts, fmt.Errorf("Triggered alerts' names listing : http error :  %s \nResponse : %v", status, string(respDump))
+		} else {
+			return triggeredAlerts, fmt.Errorf("Triggered alerts' names listing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
+		}
+	}
+
+	if err != nil {
+		return triggeredAlerts, fmt.Errorf("Triggered alerts' names listing : error while getting the body of the get request : %s", err)
+	}
+
+	err = json.Unmarshal(body, &triggeredAlerts)
+	if err != nil {
+		return triggeredAlerts, fmt.Errorf("Could not map list of alerts to datastructure: %s", err.Error())
+	}
+
+	return triggeredAlerts, nil
+}
+
+func GetInstancesOfTriggeredAlert(client *splunk.SplunkClient, sid string) (TriggeredInstances, error) {
+	
+	var triggeredInstances TriggeredInstances
+	
+	// create the endpoint for the request
+	CreateServiceEndpoint(client, PATH_TRIGGERED_ALERTS)
+
+	resp, err := GetAlerts(client)
+
+	var respDump []byte
+	var errDump error 
+	if(resp!=nil){
+		respDump, errDump = httputil.DumpResponse(resp, true)
+		if errDump != nil {
+			fmt.Println(errDump)
+		}
+	}
+
+	if err != nil {
+		return triggeredInstances, fmt.Errorf("Triggered instances' names listing : error while making the get request : %s", err)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	// handle error
+	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
+		status, err := splunk.HandleHttpError(body)
+		if err == nil {
+			return triggeredInstances, fmt.Errorf("Triggered instances' names listing : http error :  %s \nResponse : %v", status, string(respDump))
+		} else {
+			return triggeredInstances, fmt.Errorf("Triggered instances' names listing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
+		}
+	}
+
+	if err != nil {
+		return triggeredInstances, fmt.Errorf("Triggered instances' names listing : error while getting the body of the get request : %s", err)
+	}
+
+	err = json.Unmarshal(body, &triggeredInstances)
+	if err != nil {
+		return triggeredInstances, fmt.Errorf("Could not map list of alerts to datastructure: %s", err.Error())
+	}
+
+	return triggeredInstances, nil
+}
+
 // Return the sid from the body of the given response
 func getSID(resp []byte) (string, error) {
 	respJson := string(resp)
