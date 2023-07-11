@@ -48,6 +48,7 @@ type Links struct {
 }
 
 type Content struct {
+	Sid string `json:"sid"`
 	SavedSearchName string `json:"savedsearch_name"`
 	TriggerTime int `json:"trigger_time"`
 	TriggeredAlertCount int `json:"triggered_alert_count"`
