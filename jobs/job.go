@@ -299,12 +299,13 @@ func GetTriggeredAlerts(client *splunk.SplunkClient) (TriggeredAlerts, error) {
 	return triggeredAlerts, nil
 }
 
-func GetInstancesOfTriggeredAlert(client *splunk.SplunkClient, sid string) (TriggeredInstances, error) {
+func GetInstancesOfTriggeredAlert(client *splunk.SplunkClient, link string) (TriggeredInstances, error) {
 	
 	var triggeredInstances TriggeredInstances
 	
 	// create the endpoint for the request
 	CreateServiceEndpoint(client, PATH_TRIGGERED_ALERTS)
+	client.Endpoint= client.Endpoint+strings.TrimPrefix(link, "/")
 
 	resp, err := GetAlerts(client)
 
