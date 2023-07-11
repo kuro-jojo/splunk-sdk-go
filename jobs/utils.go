@@ -36,7 +36,7 @@ type TriggeredInstances struct {
 type EntryItem struct {
 	Name string `json:"name"`
 	Links Links `json:"links"`
-	Content string `content:"content"`
+	Content Content `content:"content"`
 }
 
 type Links struct {
