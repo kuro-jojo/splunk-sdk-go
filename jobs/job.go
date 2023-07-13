@@ -306,7 +306,6 @@ func GetInstancesOfTriggeredAlert(client *splunk.SplunkClient, link string) (Tri
 	// create the endpoint for the request
 	CreateServiceEndpoint(client, PATH_TRIGGERED_ALERTS)
 	client.Endpoint= client.Endpoint+strings.TrimPrefix(link, "/")
-	fmt.Println("LINK : "+client.Endpoint)
 
 	resp, err := GetAlerts(client)
 
@@ -328,9 +327,9 @@ func GetInstancesOfTriggeredAlert(client *splunk.SplunkClient, link string) (Tri
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := splunk.HandleHttpError(body)
 		if err == nil {
-			return triggeredInstances, fmt.Errorf("Triggered instances' names listing : http error :  %s \nResponse : %v", status, string(respDump))
+			return triggeredInstances, fmt.Errorf("Triggered instances' names listing : http error :  %s \nResponse : %v, LINK : %v", status, string(respDump), client.Endpoint)
 		} else {
-			return triggeredInstances, fmt.Errorf("Triggered instances' names listing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
+			return triggeredInstances, fmt.Errorf("Triggered instances' names listing : http error :  %s \nResponse : %v, LINK : %v", status, string(respDump), client.Endpoint)
 		}
 	}
 
