@@ -306,6 +306,7 @@ func GetInstancesOfTriggeredAlert(client *splunk.SplunkClient, link string) (Tri
 	// create the endpoint for the request
 	CreateServiceEndpoint(client, PATH_TRIGGERED_ALERTS)
 	client.Endpoint= client.Endpoint+strings.TrimPrefix(link, "/")
+	fmt.Println("LINK : "+client.Endpoint)
 
 	resp, err := GetAlerts(client)
 
