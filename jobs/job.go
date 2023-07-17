@@ -73,7 +73,7 @@ func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest, ser
 
 	// create the new endpoint for the post request
 	var sid string
-	if service == PATH_JOBS_V2 {
+	if service==PATH_JOBS_V2{
 		sid, err = getSID(body)
 		if err != nil {
 			return "", fmt.Errorf("error : %s", err)
@@ -84,7 +84,7 @@ func CreateJob(client *splunk.SplunkClient, spRequest *splunk.SplunkRequest, ser
 }
 
 // Creates a new alert from saved search
-func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) error {
+func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) (error) {
 
 	// create the endpoint for the request
 	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES)
@@ -93,8 +93,8 @@ func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) error
 	resp, err := PostAlert(client, spAlert)
 
 	var respDump []byte
-	var errDump error
-	if resp != nil {
+	var errDump error 
+	if(resp!=nil){
 		respDump, errDump = httputil.DumpResponse(resp, true)
 		if errDump != nil {
 			fmt.Println(errDump)
@@ -124,7 +124,7 @@ func CreateAlert(client *splunk.SplunkClient, spAlert *splunk.SplunkAlert) error
 }
 
 // Removes an existing saved search
-func RemoveAlert(client *splunk.SplunkClient, alertName string) error {
+func RemoveAlert(client *splunk.SplunkClient, alertName string) (error) {
 
 	// create the endpoint for the request
 	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES+alertName)
@@ -135,8 +135,8 @@ func RemoveAlert(client *splunk.SplunkClient, alertName string) error {
 	resp, err := DeleteAlert(client, &splunkAlert)
 
 	var respDump []byte
-	var errDump error
-	if resp != nil {
+	var errDump error 
+	if(resp!=nil){
 		respDump, errDump = httputil.DumpResponse(resp, true)
 		if errDump != nil {
 			fmt.Println(errDump)
@@ -169,15 +169,15 @@ func RemoveAlert(client *splunk.SplunkClient, alertName string) error {
 func ListAlertsNames(client *splunk.SplunkClient) (splunkAlertList, error) {
 
 	var alertList splunkAlertList
-
+	
 	// create the endpoint for the request
 	CreateServiceEndpoint(client, PATH_SAVED_SEARCHES)
 
 	resp, err := GetAlerts(client)
 
 	var respDump []byte
-	var errDump error
-	if resp != nil {
+	var errDump error 
+	if(resp!=nil){
 		respDump, errDump = httputil.DumpResponse(resp, true)
 		if errDump != nil {
 			fmt.Println(errDump)
@@ -257,15 +257,15 @@ func RetrieveJobResult(client *splunk.SplunkClient, sid string) ([]map[string]st
 func GetTriggeredAlerts(client *splunk.SplunkClient) (TriggeredAlerts, error) {
 
 	var triggeredAlerts TriggeredAlerts
-
+	
 	// create the endpoint for the request
 	CreateServiceEndpoint(client, PATH_TRIGGERED_ALERTS)
 
 	resp, err := GetAlerts(client)
 
 	var respDump []byte
-	var errDump error
-	if resp != nil {
+	var errDump error 
+	if(resp!=nil){
 		respDump, errDump = httputil.DumpResponse(resp, true)
 		if errDump != nil {
 			fmt.Println(errDump)
@@ -300,17 +300,17 @@ func GetTriggeredAlerts(client *splunk.SplunkClient) (TriggeredAlerts, error) {
 }
 
 func GetInstancesOfTriggeredAlert(client *splunk.SplunkClient, link string) (TriggeredInstances, error) {
-
+	
 	var triggeredInstances TriggeredInstances
-
+	
 	// create the endpoint for the request
 	CreateServiceEndpoint(client, strings.TrimPrefix(link, "/"))
 
 	resp, err := GetAlerts(client)
 
 	var respDump []byte
-	var errDump error
-	if resp != nil {
+	var errDump error 
+	if(resp!=nil){
 		respDump, errDump = httputil.DumpResponse(resp, true)
 		if errDump != nil {
 			fmt.Println(errDump)

@@ -40,6 +40,8 @@ type AlertParams struct {
 	LatestTime string
 	//condition for triggering the alert
 	AlertCondition string
+	AlertSuppress string
+	AlertSuppressPeriod string
 	Actions string
 	WebhookUrl string
 }

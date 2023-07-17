@@ -187,6 +187,12 @@ func HttpAlertRequest(client *splunk.SplunkClient, method string, spAlert *splun
 		if spAlert.Params.AlertCondition != "" {
 			params.Add("alert_condition", spAlert.Params.AlertCondition)
 		}
+		if spAlert.Params.AlertSuppress != "" {
+			params.Add("alert.suppress", spAlert.Params.AlertSuppress)
+		}
+		if spAlert.Params.AlertSuppressPeriod != "" {
+			params.Add("alert.suppress.period", spAlert.Params.AlertSuppressPeriod)
+		}
 
 		params.Add("is_scheduled", "1")
 
