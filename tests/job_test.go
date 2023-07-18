@@ -32,7 +32,7 @@ func RunTestsWithEnvVars() bool {
 
 func TestGetMetric(t *testing.T) {
 	jsonResponsePOST := `{
-		"sid": "10"
+		"sid": "1689673231.191"
 	}`
 
 	jsonResponseGET := `{
@@ -82,7 +82,7 @@ func TestGetMetric(t *testing.T) {
 func TestCreateJob(t *testing.T) {
 
 	jsonResponsePOST := `{
-		"sid": "10"
+		"sid": "1689673231.191"
 	}`
 	server := MockRequest(jsonResponsePOST, true)
 	defer server.Close()
@@ -110,7 +110,7 @@ func TestCreateJob(t *testing.T) {
 		t.Fatalf("Got an error : %s", err)
 	}
 
-	expectedSID := "10"
+	expectedSID := "1689673231.191"
 	if sid != expectedSID {
 		t.Fatalf("Expected %v but got %v.", expectedSID, sid)
 	}
