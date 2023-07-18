@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	splunk "github.com/kuro-jojo/splunk-sdk-go/internal/client"
-	"github.com/kuro-jojo/splunk-sdk-go/internal/jobs"
 	"github.com/kuro-jojo/splunk-sdk-go/pkg/utils"
+	splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
+	"github.com/kuro-jojo/splunk-sdk-go/src/jobs"
 )
 
 func TestMain(m *testing.M) {

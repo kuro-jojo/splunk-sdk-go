@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	splunk "github.com/kuro-jojo/splunk-sdk-go/internal/client"
 	utils "github.com/kuro-jojo/splunk-sdk-go/pkg/utils"
+	splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
 )
 
 const savedSearchesPath = "services/saved/searches/"
