@@ -1,5 +1,5 @@
 # Splunk SDK for Go 
-*Version 0.1.0*
+*Version 1.6.0*
 
 The Splunk Software Development Kit for Go contains functions designed to enable developers to communicate with Splunk Enterprise through the splunk API.
 
