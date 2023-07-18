@@ -54,18 +54,18 @@ func writeResponses(responses interface{}, w *http.ResponseWriter, r *http.Reque
 	case []map[string]interface{}:
 		for _, response := range resps {
 			if r.Method == "GET" {
-				if response[getTriggeredAlerts] != nil && strings.Contains(r.URL.Path, getTriggeredAlerts) {
+				if response[getTriggeredAlerts] != nil && strings.HasSuffix(r.URL.Path, "services/alerts/fired_alerts/") {
 					_, _ = (*w).Write([]byte(response[getTriggeredAlerts].(string)))
-				} else if response[getTriggeredInstances] != nil && strings.Contains(r.URL.Path, getTriggeredInstances) {
+				} else if response[getTriggeredInstances] != nil && strings.Contains(r.URL.Path, "services/alerts/fired_alerts/") {
 					_, _ = (*w).Write([]byte(response[getTriggeredInstances].(string)))
-				} else if response[getAlertsNames] != nil && strings.Contains(r.URL.Path, getAlertsNames) {
+				} else if response[getAlertsNames] != nil && strings.Contains(r.URL.Path, "services/saved/searches/") {
 					_, _ = (*w).Write([]byte(response[getAlertsNames].(string)))
 				} else if response["GET"] != nil && r.Method == "GET" {
 					_, _ = (*w).Write([]byte(response["GET"].(string)))
 				}
 			}
 			if r.Method == "POST" {
-				if response[createAlerts] != nil && strings.Contains(r.URL.Path, createAlerts) {
+				if response[createAlerts] != nil && strings.Contains(r.URL.Path, "services/saved/searches/") {
 					_, _ = (*w).Write([]byte(response[createAlerts].(string)))
 				} else if response["POST"] != nil {
 					_, _ = (*w).Write([]byte(response["POST"].(string)))
