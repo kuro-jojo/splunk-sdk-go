@@ -56,7 +56,7 @@ func writeResponses(responses interface{}, w *http.ResponseWriter, r *http.Reque
 			if r.Method == "GET" {
 				if response[getTriggeredAlerts] != nil && strings.HasSuffix(r.URL.Path, "services/alerts/fired_alerts/") {
 					_, _ = (*w).Write([]byte(response[getTriggeredAlerts].(string)))
-				} else if response[getTriggeredInstances] != nil && strings.Contains(r.URL.Path, "services/alerts/fired_alerts/") {
+				} else if response[getTriggeredInstances] != nil && strings.Contains(r.URL.Path, "search/alerts/fired_alerts/") {
 					_, _ = (*w).Write([]byte(response[getTriggeredInstances].(string)))
 				} else if response[getAlertsNames] != nil && strings.Contains(r.URL.Path, "services/saved/searches/") {
 					_, _ = (*w).Write([]byte(response[getAlertsNames].(string)))
