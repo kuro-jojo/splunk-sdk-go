@@ -4,7 +4,7 @@ import (
 	"net"
 	"strings"
 
-	splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
+	splunk "github.com/kuro-jojo/splunk-sdk-go/client"
 )
 
 func ValidateSearchQuery(searchQuery string) string {
@@ -15,15 +15,27 @@ func ValidateSearchQuery(searchQuery string) string {
 	}
 	return searchQuery
 }
+
+func ValidateAlertQuery(alertQuery string) string {
+	// the search must start with the "search" keyword
+	const query_prefix = "search "
+	if strings.HasPrefix(alertQuery, query_prefix) {
+		return strings.Replace(alertQuery, "search ", "", 1)
+	}
+	return alertQuery
+}
+
 func CreateEndpoint(client *splunk.SplunkClient, service string) {
 	host := client.Host
 	port := client.Port
 
-	if strings.HasPrefix(host, "https://") {
+	switch {
+	case strings.HasPrefix(host, "https://"):
 		host = strings.Replace(host, "https://", "", 1)
-	} else if strings.HasPrefix(host, "http://") {
+	case strings.HasPrefix(host, "http://"):
 		host = strings.Replace(host, "http://", "", 1)
 	}
+
 	client.Endpoint = "https://" + net.JoinHostPort(host, port) + "/" + service
 	client.Endpoint = strings.ReplaceAll(client.Endpoint, " ", "")
 }

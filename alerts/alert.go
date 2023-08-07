@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	splunk "github.com/kuro-jojo/splunk-sdk-go/client"
 	utils "github.com/kuro-jojo/splunk-sdk-go/pkg/utils"
-	splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
 )
 
 const savedSearchesPath = "services/saved/searches/"
@@ -85,7 +85,7 @@ func CreateAlert(client *splunk.SplunkClient, spAlert *AlertRequest) error {
 
 	// create the endpoint for the request
 	utils.CreateEndpoint(client, savedSearchesPath)
-	spAlert.Params.SearchQuery = utils.ValidateSearchQuery(spAlert.Params.SearchQuery)
+	spAlert.Params.SearchQuery = utils.ValidateAlertQuery(spAlert.Params.SearchQuery)
 
 	resp, err := PostAlert(client, spAlert)
 
@@ -99,22 +99,23 @@ func CreateAlert(client *splunk.SplunkClient, spAlert *AlertRequest) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("Alert creation : error while making the post request : %s", err)
+		return fmt.Errorf("alert creation : error while making the post request : %s", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	// handle error
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := splunk.HandleHttpError(body)
-		if err == nil {
-			return fmt.Errorf("Alert creation : http error :  %s \nResponse : %v", status, string(respDump))
-		} else {
-			return fmt.Errorf("Alert creation : http error :  %s \nResponse : %v", resp.Status, string(respDump))
+		switch err {
+		case nil:
+			return fmt.Errorf("alert creation : http error :  %s \nResponse : %v", status, string(respDump))
+		default:
+			return fmt.Errorf("alert creation : http error :  %s \nResponse : %v", resp.Status, string(respDump))
 		}
 	}
 
 	if err != nil {
-		return fmt.Errorf("Alert creation : error while getting the body of the post request : %s", err)
+		return fmt.Errorf("alert creation : error while getting the body of the post request : %s", err)
 	}
 
 	return nil
@@ -141,22 +142,23 @@ func RemoveAlert(client *splunk.SplunkClient, alertName string) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("Alert Removing : error while making the delete request : %s", err)
+		return fmt.Errorf("alert Removing : error while making the delete request : %s", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	// handle error
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := splunk.HandleHttpError(body)
-		if err == nil {
-			return fmt.Errorf("Alert Removing : http error :  %s \nResponse : %v", status, string(respDump))
-		} else {
-			return fmt.Errorf("Alert Removing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
+		switch err {
+		case nil:
+			return fmt.Errorf("alert Removing : http error :  %s \nResponse : %v", status, string(respDump))
+		default:
+			return fmt.Errorf("alert Removing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
 		}
 	}
 
 	if err != nil {
-		return fmt.Errorf("Alert Removing : error while getting the body of the delete request : %s", err)
+		return fmt.Errorf("alert Removing : error while getting the body of the delete request : %s", err)
 	}
 
 	return nil
@@ -182,27 +184,28 @@ func ListAlertsNames(client *splunk.SplunkClient) (splunkAlertList, error) {
 	}
 
 	if err != nil {
-		return alertList, fmt.Errorf("Alerts' names listing : error while making the get request : %s", err)
+		return alertList, fmt.Errorf("alerts' names listing : error while making the get request : %s", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	// handle error
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := splunk.HandleHttpError(body)
-		if err == nil {
-			return alertList, fmt.Errorf("Alerts' names listing : http error :  %s \nResponse : %v", status, string(respDump))
-		} else {
-			return alertList, fmt.Errorf("Alerts' names listing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
+		switch err {
+		case nil:
+			return alertList, fmt.Errorf("alerts' names listing : http error :  %s \nResponse : %v", status, string(respDump))
+		default:
+			return alertList, fmt.Errorf("alerts' names listing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
 		}
 	}
 
 	if err != nil {
-		return alertList, fmt.Errorf("Alerts' names listing : error while getting the body of the get request : %s", err)
+		return alertList, fmt.Errorf("alerts' names listing : error while getting the body of the get request : %s", err)
 	}
 
 	err = json.Unmarshal(body, &alertList)
 	if err != nil {
-		return alertList, fmt.Errorf("Could not map list of alerts to datastructure: %s", err.Error())
+		return alertList, fmt.Errorf("could not map list of alerts to datastructure: %w", err)
 	}
 
 	return alertList, nil
@@ -227,27 +230,28 @@ func GetTriggeredAlerts(client *splunk.SplunkClient) (TriggeredAlerts, error) {
 	}
 
 	if err != nil {
-		return triggeredAlerts, fmt.Errorf("Triggered alerts' names listing : error while making the get request : %s", err)
+		return triggeredAlerts, fmt.Errorf("triggered alerts' names listing : error while making the get request : %s", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	// handle error
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := splunk.HandleHttpError(body)
-		if err == nil {
-			return triggeredAlerts, fmt.Errorf("Triggered alerts' names listing : http error :  %s \nResponse : %v", status, string(respDump))
-		} else {
-			return triggeredAlerts, fmt.Errorf("Triggered alerts' names listing : http error :  %s \nResponse : %v", resp.Status, string(respDump))
+		switch err {
+		case nil:
+			return triggeredAlerts, fmt.Errorf("triggered alerts' names listing : http error :  %s \nResponse : %s", status, string(respDump))
+		default:
+			return triggeredAlerts, fmt.Errorf("triggered alerts' names listing : http error :  %s \nResponse : %s", resp.Status, string(respDump))
 		}
 	}
 
 	if err != nil {
-		return triggeredAlerts, fmt.Errorf("Triggered alerts' names listing : error while getting the body of the get request : %s", err)
+		return triggeredAlerts, fmt.Errorf("triggered alerts' names listing : error while getting the body of the get request : %s", err)
 	}
 
 	err = json.Unmarshal(body, &triggeredAlerts)
 	if err != nil {
-		return triggeredAlerts, fmt.Errorf("Could not map list of alerts to datastructure: %s", err.Error())
+		return triggeredAlerts, fmt.Errorf("could not map list of alerts to datastructure: %w", err)
 	}
 
 	return triggeredAlerts, nil
@@ -272,27 +276,28 @@ func GetInstancesOfTriggeredAlert(client *splunk.SplunkClient, link string) (Tri
 	}
 
 	if err != nil {
-		return triggeredInstances, fmt.Errorf("Triggered instances' names listing : error while making the get request : %s", err)
+		return triggeredInstances, fmt.Errorf("triggered instances' names listing : error while making the get request : %s", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	// handle error
 	if !strings.HasPrefix(strconv.Itoa(resp.StatusCode), "2") {
 		status, err := splunk.HandleHttpError(body)
-		if err == nil {
-			return triggeredInstances, fmt.Errorf("Triggered instances' names listing : http error :  %s \nResponse : %v, LINK : %v", status, string(respDump), client.Endpoint)
-		} else {
-			return triggeredInstances, fmt.Errorf("Triggered instances' names listing : http error :  %s \nResponse : %v, LINK : %v", status, string(respDump), client.Endpoint)
+		switch err {
+		case nil:
+			return triggeredInstances, fmt.Errorf("triggered instances' names listing : http error :  %s \nResponse : %s, LINK : %s", status, string(respDump), client.Endpoint)
+		default:
+			return triggeredInstances, fmt.Errorf("triggered instances' names listing : http error :  %s \nResponse : %s, LINK : %s", status, string(respDump), client.Endpoint)
 		}
 	}
 
 	if err != nil {
-		return triggeredInstances, fmt.Errorf("Triggered instances' names listing : error while getting the body of the get request : %s", err)
+		return triggeredInstances, fmt.Errorf("triggered instances' names listing : error while getting the body of the get request : %w", err)
 	}
 
 	err = json.Unmarshal(body, &triggeredInstances)
 	if err != nil {
-		return triggeredInstances, fmt.Errorf("Could not map list of alerts to datastructure: %s", err.Error())
+		return triggeredInstances, fmt.Errorf("could not map list of alerts to datastructure: %w", err)
 	}
 
 	return triggeredInstances, nil
