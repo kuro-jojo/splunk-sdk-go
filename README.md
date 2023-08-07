@@ -1,5 +1,5 @@
 # Splunk SDK for Go 
-*Version 1.6.0*
+*Version 1.7.0*
 
 The Splunk Software Development Kit for Go contains functions designed to enable developers to communicate with Splunk Enterprise through the splunk API.
 
@@ -45,7 +45,7 @@ You'll need at first a Splunk enterprise instance running. If you don't have one
 **Using username and password**
 ```go
     import (
-        splunk "github.com/kuro-jojo/splunk-sdk-go"
+        splunk "github.com/kuro-jojo/splunk-sdk-go/client"
     )
     ...
         splunkInstance := "localhost" // or your splunk instance IP
@@ -65,7 +65,7 @@ You'll need at first a Splunk enterprise instance running. If you don't have one
 **Using token authentication**
 ```go
     import (
-        splunk "github.com/kuro-jojo/splunk-sdk-go"
+        splunk "github.com/kuro-jojo/splunk-sdk-go/client"
     )
     ...
         splunkInstance := "localhost"
@@ -83,7 +83,7 @@ You'll need at first a Splunk enterprise instance running. If you don't have one
 **Using authentication sessionKey**
 ```go
     import (
-        splunk "github.com/kuro-jojo/splunk-sdk-go"
+        splunk "github.com/kuro-jojo/splunk-sdk-go/client"
     )
     ...
         splunkInstance := "localhost"
@@ -110,11 +110,11 @@ import (
 )
 ...
     // create the parameters for the search
-    searchParameters := splunk.RequestParams{
+    searchParameters := splunk.SearchParams{
         SearchQuery: "index=main | head 10",
     }
 
-    spReq := splunk.SplunkRequest{
+    spReq := splunk.SearchRequest{
         Params: searchParameters,
         Headers: map[string]string{
             "Content-Type": "application/text",
@@ -163,8 +163,8 @@ import (
 ...
     // create the parameters for the search
 
-    spReq := splunk.SplunkRequest{
-        Params: splunk.RequestParams{
+    spReq := splunk.SearchRequest{
+        Params: splunk.SearchParams{
             SearchQuery: "index=main | stats count",
         },
     }
