@@ -45,7 +45,7 @@ You'll need at first a Splunk enterprise instance running. If you don't have one
 **Using username and password**
 ```go
     import (
-        splunk "github.com/kuro-jojo/splunk-sdk-go/client"
+        splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
     )
     ...
         splunkInstance := "localhost" // or your splunk instance IP
@@ -65,7 +65,7 @@ You'll need at first a Splunk enterprise instance running. If you don't have one
 **Using token authentication**
 ```go
     import (
-        splunk "github.com/kuro-jojo/splunk-sdk-go/client"
+        splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
     )
     ...
         splunkInstance := "localhost"
@@ -83,7 +83,7 @@ You'll need at first a Splunk enterprise instance running. If you don't have one
 **Using authentication sessionKey**
 ```go
     import (
-        splunk "github.com/kuro-jojo/splunk-sdk-go/client"
+        splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
     )
     ...
         splunkInstance := "localhost"
@@ -104,8 +104,8 @@ You'll need at first a Splunk enterprise instance running. If you don't have one
 ```go
 ...
 import ( 
-    splunk "github.com/kuro-jojo/splunk-sdk-go/client"
-    job "github.com/kuro-jojo/splunk-sdk-go/jobs"
+    splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
+    job "github.com/kuro-jojo/splunk-sdk-go/src/jobs"
     ...
 )
 ...
@@ -136,8 +136,8 @@ import (
 ```go
 ...
 import ( 
-    splunk "github.com/kuro-jojo/splunk-sdk-go/client"
-    job "github.com/kuro-jojo/splunk-sdk-go/jobs"
+    splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
+    job "github.com/kuro-jojo/splunk-sdk-go/src/jobs"
     ...
 )
 ...
@@ -156,8 +156,8 @@ import (
 ```go
 ...
 import ( 
-    splunk "github.com/kuro-jojo/splunk-sdk-go/client"
-    job "github.com/kuro-jojo/splunk-sdk-go/jobs"
+    splunk "github.com/kuro-jojo/splunk-sdk-go/src/client"
+    job "github.com/kuro-jojo/splunk-sdk-go/src/jobs"
     ...
 )
 ...
